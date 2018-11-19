@@ -7,7 +7,7 @@ var express = require('express');
 var router = express.Router();
 
 router.post('/',function (req,res) {
-    console.log(req.files[0]);  // 上传的文件信息
+    console.log(req);  // 上传的文件信息
  
     res.send('{result:success!}')
     // var des_file = "./upload/" + req.files[0].originalname;
