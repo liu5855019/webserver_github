@@ -31,19 +31,7 @@ app.use('/other',other);
 app.use('/upload',uploadFile);
 
 app.get("/",function (request , response) {
-    pool.getConnection(function(err, connection){
-        if (err) {
-            console.log("46" + err);
-        } else {
-            connection.query(userSql.selectAll, function (err, result) {
-                if (err) {
-                    console.log("54" + err);
-                } else {
-                    console.log(result);
-                }
-            })
-        }
-    })
+    
     response.send("hello world");
 });
 
