@@ -48,6 +48,7 @@ app.get("/",function (request , response) {
 app.get("/uploadScore", function (request , response) {
     console.log("访问了/uploadScore");
     console.log(request.query);
+    
     response.send("Success");
 });
 
