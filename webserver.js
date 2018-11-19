@@ -3,6 +3,7 @@ var express = require('express')
 var app = express()
 var user = require('./Script/User')
 var other = require('./Script/other')
+var uploadFile = require('./Script/UploadFile')
 
 var pool = require('./Script/DBConfig')
 
@@ -27,6 +28,7 @@ app.use(express.static('public'),function(req, res, next) {
 
 app.use('/user', user);
 app.use('/other',other);
+app.use('/upload',uploadFile);
 
 app.get("/",function (request , response) {
     pool.getConnection(function(err, connection){
