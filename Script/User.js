@@ -6,7 +6,7 @@ var router = express.Router();
 var pool = require('./DBConfig');
 
 var userSql = {
-    insert : 'INSERT INTO user(username,password) VALUES(?,?)',
+    insert : 'INSERT INTO user(username,password,create_time) VALUES(?,?,?)',
     selectAll : 'SELECT * FROM user',
     selectUsername : 'SELECT * FROM user WHERE username = ?',
 }
@@ -22,7 +22,11 @@ router.get('/userList', function (req, res) {
                 if (err) {
                     res.send(500,'select error');
                 } else {
-                    res.send(result);
+                    res.send({
+                        "code":200,
+                        "msg":"success",
+                        "obj":result
+                    });
                 }
             })
         }
@@ -36,35 +40,38 @@ router.get('/register', function (req , res) {
     var username = req.query.username;
     var password = req.query.password;
 
-    pool.getConnection(function (err,connection) {
+    pool.getConnection(function (err,connection) {  // 链接数据库
         if (err) {
             res.send(500,'link error');
-        } else {
-            connection.query(userSql.selectUsername , username , function (err,result) {
+            return;
+        } 
+        connection.query(userSql.selectUsername , username , function (err,result) {    //查看username 是否已被注册
+            if (err) {
+                console.log(err);
+                res.send(500,'select err');
+                return;
+            }
+            if (result.length) {
+                res.send('{"desc":"this user is exist"}');
+                return;
+            } 
+            // console.log(Date().);
+            // var now = Date().toString();
+            connection.query(userSql.insert,[username,password,Date()], function (err, result) {
                 if (err) {
                     console.log(err);
-                    res.send(500,'select err');
+                    res.send(500,'register error');
                 } else {
-                    if (result.length) {
-                        res.send('{"desc":"this user is exist"}');
-                    } else {
-                        connection.query(userSql.insert,[username,password], function (err, result) {
-                            if (err) {
-                                console.log(err);
-                                res.send(500,'register error');
-                            } else {
-                                console.log(result);
-                                
-                                res.send({
-                                    username:req.query.username,
-                                    password:req.query.password
-                                })
-                            }
-                        })
-                    }
+                    console.log(result);
+                    
+                    res.send({
+                        "code":200,
+                        "msg":"success",
+                        "obj":{}
+                    })
                 }
             })
-        }
+        })
     });
 })
 
