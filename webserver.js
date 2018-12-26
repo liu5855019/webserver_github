@@ -1,11 +1,17 @@
 
 var express = require('express')
 var app = express()
-var user = require('./Script/User')
+var user = require('./Script/Api/User')
 var other = require('./Script/other')
 var uploadFile = require('./Script/UploadFile')
 
 var pool = require('./Script/DBConfig')
+
+
+
+
+
+
 
 
 app.all('*', function(req, res, next) {
@@ -41,6 +47,9 @@ app.get("/uploadScore", function (request , response) {
     
     response.send("Success");
 });
+
+
+
 
 server = app.listen(3000 , ()=>{
     console.log("Server is begin at port:" + server.address().port);
