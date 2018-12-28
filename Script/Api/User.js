@@ -5,6 +5,7 @@ var router = express.Router();
 
 var pool = require('../DBConfig');
 var md5 = require('../Global/Md5');
+var dmtools = require('../Global/DMTools')
 
 var userSql = {
     selectAll : 'SELECT * FROM user',
@@ -39,10 +40,28 @@ router.get('/register', function (req , res) {
     var username = req.query.username;
     var password = req.query.password;
 
+    if (!username || !password) {
+        res.send(500,{
+            "code":204,
+            "msg":"Username or Password cannot null",
+            "obj":{}
+        });
+        return;
+    }
+
     if (username.length < 4 || password.length < 3) {
         res.send({
             "code":202,
             "msg":"Username or Password is too short",
+            "obj":{}
+        });
+        return;
+    }
+
+    if (username.length > 15 || password.length > 15) {
+        res.send({
+            "code":203,
+            "msg":"Username or Password is too long",
             "obj":{}
         });
         return;
@@ -143,7 +162,7 @@ function checkUser(connection,username,res,callback) {
 }
 
 function register(connection,username,password,res,callback) {
-    connection.query('INSERT INTO user(username,password,create_time) VALUES(?,?,?)',[username,password,new Date()], function (err, result) {
+    connection.query('INSERT INTO user(guid,username,password,create_time) VALUES(?,?,?,?)',[dmtools.guid(),username,password,new Date()], function (err, result) {
         if (err) {
             res.send(500,err);
         } else {
@@ -152,6 +171,7 @@ function register(connection,username,password,res,callback) {
     });
 }
 
+//登录操作,插入token,插入登录超时时间
 function login(connection,username,token,token_time,res,callback) {
     connection.query('UPDATE user SET token = ? , token_time = ? WHERE username = ?',[token,token_time,username],function (err,result) {
         if (err) {
