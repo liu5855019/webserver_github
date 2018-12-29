@@ -6,7 +6,7 @@ var other = require('./Script/other')
 var uploadFile = require('./Script/UploadFile')
 
 var pool = require('./Script/DBConfig')
-
+var bodyParser = require('body-parser');
 
 
 
@@ -26,6 +26,11 @@ app.all('*', function(req, res, next) {
     //res.header("Content-Type", "image/png");
     next();
 });
+
+//json
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+
 
 /** 共享public文件夹 */
 app.use(express.static('public'),function(req, res, next) {

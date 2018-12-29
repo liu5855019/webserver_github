@@ -34,20 +34,13 @@ router.get('/userList', function (req, res) {
 });
 
 /** 注册用户 */
-router.get('/register', function (req , res) {
-    console.log(req.query);
-    
-    var username = req.query.username;
-    var password = req.query.password;
+router.post('/register', function (req , res) {
 
-    if (!username || !password) {
-        res.send(500,{
-            "code":204,
-            "msg":"Username or Password cannot null",
-            "obj":{}
-        });
-        return;
-    }
+    let query = req.body;
+    console.log(query);
+
+    var username = query.username;
+    var password = query.password;
 
     if (username.length < 4 || password.length < 3) {
         res.send({
@@ -62,6 +55,15 @@ router.get('/register', function (req , res) {
         res.send({
             "code":203,
             "msg":"Username or Password is too long",
+            "obj":{}
+        });
+        return;
+    }
+
+    if (!username || !password) {
+        res.send(500,{
+            "code":204,
+            "msg":"Username or Password cannot null",
             "obj":{}
         });
         return;
@@ -96,10 +98,40 @@ router.get('/register', function (req , res) {
 });
 
 /** 登录 */
-router.get('/login',function (req,res) {
+router.post('/login',function (req,res) {
 
-    let username = req.query.username;
-    let password = req.query.password;
+    let query = req.body;
+    console.log(query);
+
+    var username = query.username;
+    var password = query.password;
+
+    if (username.length < 4 || password.length < 3) {
+        res.send({
+            "code":203,
+            "msg":"Username or Password is too short",
+            "obj":{}
+        });
+        return;
+    }
+
+    if (username.length > 15 || password.length > 15) {
+        res.send({
+            "code":204,
+            "msg":"Username or Password is too long",
+            "obj":{}
+        });
+        return;
+    }
+
+    if (!username || !password) {
+        res.send(500,{
+            "code":205,
+            "msg":"Username or Password cannot null",
+            "obj":{}
+        });
+        return;
+    }
 
     pool.getConnection(function (err,connection) {  // 链接数据库
         if (err) {
