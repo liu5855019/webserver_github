@@ -34,7 +34,7 @@ router.get('/userList', function (req, res) {
 });
 
 /** 注册用户 */
-router.post('/register', function (req , res) {
+router.post('/regist', function (req , res) {
 
     let query = req.body;
     console.log(query);
@@ -80,7 +80,7 @@ router.post('/register', function (req , res) {
                 res.send({
                     "code":201,
                     "msg":"This user is exist",
-                    "obj":{}
+                    "obj":null
                 });
                 return;
             } 
