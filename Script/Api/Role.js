@@ -44,16 +44,17 @@ router.post('/createRole', function (req , res) {
         return;
     }
     
-
-    
-
-    
-
     pool.getConnection(function (err,connection) {  // 链接数据库
         if (err) {
-            res.send(500,'link error');
+            res.send(500,err);
             return;
         } 
+
+        project.getuser(req,connection,res,function (user) {
+            console.log(user);
+            
+        });
+
         //检查用户是否存在
         checkUser(connection,username,res,function (result) {   
             if (result.length) {

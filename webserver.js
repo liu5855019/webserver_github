@@ -17,7 +17,7 @@ var bodyParser = require('body-parser');
 
 
 app.all('*', function(req, res, next) {
-    console.log(req.url);
+    console.log( new Date() + " : " + req.url);
     
     res.header("Access-Control-Allow-Origin", "*");
     //res.header("Access-Control-Allow-Credentials", true);
@@ -60,6 +60,7 @@ app.get("/uploadScore", function (request , response) {
 
 
 server = app.listen(3000 , ()=>{
+    console.log(new Date());
     console.log("Server is begin at port:" + server.address().port);
 });
 
