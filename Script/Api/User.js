@@ -61,7 +61,7 @@ router.post('/regist', function (req , res) {
     }
 
     if (!username || !password) {
-        res.send(500,{
+        res.send({
             "code":204,
             "msg":"Username or Password cannot null",
             "obj":{}

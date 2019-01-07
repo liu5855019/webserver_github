@@ -1,11 +1,13 @@
 
 var express = require('express')
 var app = express()
+
 var user = require('./Script/Api/User')
 var other = require('./Script/other')
 var uploadFile = require('./Script/UploadFile')
+var role = require('./Script/Api/Role')
 
-var pool = require('./Script/DBConfig')
+
 var bodyParser = require('body-parser');
 
 
@@ -38,6 +40,7 @@ app.use(express.static('public'),function(req, res, next) {
 });
 
 app.use('/user', user);
+app.use('/role',role);
 app.use('/other',other);
 app.use('/upload',uploadFile);
 
