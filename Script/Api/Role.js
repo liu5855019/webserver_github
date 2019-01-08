@@ -48,33 +48,33 @@ router.post('/createRole', function (req , res) {
         if (err) {
             res.send(500,err);
             return;
-        } 
+        }
 
         project.getuser(req,connection,res,function (user) {
             console.log(user);
             
         });
 
-        //检查用户是否存在
-        checkUser(connection,username,res,function (result) {   
-            if (result.length) {
-                res.send({
-                    "code":201,
-                    "msg":"This user is exist",
-                    "obj":null
-                });
-                return;
-            } 
-            //注册
-            register(connection,username,password,res,function (result) {
-                console.log(result);
-                res.send({
-                    "code":200,
-                    "msg":"success",
-                    "obj":{}
-                });     
-            });
-        });
+        // //检查用户是否存在
+        // checkUser(connection,username,res,function (result) {   
+        //     if (result.length) {
+        //         res.send({
+        //             "code":201,
+        //             "msg":"This user is exist",
+        //             "obj":null
+        //         });
+        //         return;
+        //     } 
+        //     //注册
+        //     register(connection,username,password,res,function (result) {
+        //         console.log(result);
+        //         res.send({
+        //             "code":200,
+        //             "msg":"success",
+        //             "obj":{}
+        //         });     
+        //     });
+        // });
     });
 });
 
