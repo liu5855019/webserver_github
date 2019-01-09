@@ -9,6 +9,7 @@ var config = {
     port: '3306'                    // 端口号（默认都是3306）
 }
 
+
 var pool = mysql.createPool(config);
 
 module.exports = pool;
