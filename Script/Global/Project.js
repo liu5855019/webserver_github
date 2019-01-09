@@ -3,7 +3,7 @@ function getuser(req,connection,res,callback) {
 
     let token = req.headers.token;
 
-    connection.query('SELECT * FROM user WHERE token = ?',token,function (err,result) {
+    connection.query('SELECT * FROM account WHERE token = ?',token,function (err,result) {
         if (err) {
             res.send(500,err);
             return;

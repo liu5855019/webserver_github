@@ -7,6 +7,8 @@ var other = require('./Script/other')
 var uploadFile = require('./Script/UploadFile')
 var role = require('./Script/Api/Role')
 
+var hello = require('./build/Hello')
+
 
 var bodyParser = require('body-parser');
 
@@ -43,6 +45,7 @@ app.use('/user', user);
 app.use('/role',role);
 app.use('/other',other);
 app.use('/upload',uploadFile);
+app.use('/hello',hello);
 
 app.get("/",function (request , response) {
     

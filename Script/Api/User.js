@@ -184,7 +184,7 @@ router.post('/login',function (req,res) {
 
 
 function checkUser(connection,username,res,callback) {
-    connection.query('SELECT * FROM user WHERE username = ?' , username , function (err,result) {    
+    connection.query('SELECT * FROM account WHERE username = ?' , username , function (err,result) {    
         if (err) {
             res.send(500,err);
         } else {
@@ -194,7 +194,7 @@ function checkUser(connection,username,res,callback) {
 }
 
 function register(connection,username,password,res,callback) {
-    connection.query('INSERT INTO user(guid,username,password,create_time) VALUES(?,?,?,?)',[dmtools.guid(),username,password,new Date()], function (err, result) {
+    connection.query('INSERT INTO account(guid,username,password,create_time) VALUES(?,?,?,?)',[dmtools.guid(),username,password,new Date()], function (err, result) {
         if (err) {
             res.send(500,err);
         } else {
@@ -205,7 +205,7 @@ function register(connection,username,password,res,callback) {
 
 //登录操作,插入token,插入登录超时时间
 function login(connection,username,token,token_time,res,callback) {
-    connection.query('UPDATE user SET token = ? , token_time = ? WHERE username = ?',[token,token_time,username],function (err,result) {
+    connection.query('UPDATE account SET token = ? , token_time = ? WHERE username = ?',[token,token_time,username],function (err,result) {
         if (err) {
             res.send(500,err);
         } else {
