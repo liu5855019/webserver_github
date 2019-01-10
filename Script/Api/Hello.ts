@@ -4,7 +4,7 @@ import * as express from 'express';
 import { IRoute, Router } from 'express-serve-static-core';
 let router:Router = express.Router();
 
-//import { pool } from "../Global/DBConfig";
+import {pool}  from "../Global/DBConfig";
 
 
 router.get("/hello",function (req,res) {
@@ -13,19 +13,20 @@ router.get("/hello",function (req,res) {
     console.log('aaaaaaaaa');
     
 
-    res.send('444444');
-
-    // pool.getConnection(function(err, connection) {
+    pool.getConnection(function(err, connection) {
         
-    //     if (err) {
-    //         console.log('link_err');
-    //         res.send([500,err]);
-    //     } else {
-    //         res.send({
-    //             "aaa":connection
-    //         });
-    //     }
-    // });
+        if (err) {
+            console.log(err);
+            
+            res.status(500).send(err);
+            
+           
+        } else {
+            res.send({
+                "aaa":connection
+            });
+        }
+    });
     
 })
 

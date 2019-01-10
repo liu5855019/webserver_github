@@ -5,12 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const app = express_1.default();
+var bodyParser = require('body-parser'); // body json 解析
+var hello = require('./Script/Api/Hello');
 var user = require('./Script/Api/User');
-var other = require('./Script/other');
-var uploadFile = require('./Script/UploadFile');
-var role = require('./Script/Api/Role');
-var hello = require('./build/Hello');
-var bodyParser = require('body-parser');
 app.all('*', function (req, res, next) {
     console.log(new Date() + " : " + req.url);
     res.header("Access-Control-Allow-Origin", "*");
@@ -29,11 +26,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express_1.default.static('public'), function (req, res, next) {
     next();
 });
-app.use('/user', user);
-app.use('/role', role);
-app.use('/other', other);
-app.use('/upload', uploadFile);
 app.use('/hello', hello);
+app.use('/user', user);
 app.get("/", function (request, response) {
     response.send("hello world");
 });
@@ -44,5 +38,5 @@ app.get("/uploadScore", function (request, response) {
 });
 let server = app.listen(3000, () => {
     console.log(new Date());
-    console.log("Server is begin at port:" + server.address());
+    console.log("Server is begin at port:" + server.address().port);
 });

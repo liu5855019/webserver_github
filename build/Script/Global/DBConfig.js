@@ -13,15 +13,8 @@ let config = {
     user: 'root',
     password: '854623123',
     database: 'animal_chess',
-    port: '3306' // 端口号（默认都是3306）
+    port: 3306 // 端口号（默认都是3306）
 };
-let str = "{\
-    'host':'47.105.171.135',    \
-    'user': 'root',             \
-    'password': '854623123',    \
-    'database': 'animal_chess', \
-    'port': '3306'              \
-}";
 // export function db(sql: string, arg: any, callback?: any) {
 //     // 1.创建连接
 //     const config = mysql.createConnection({
@@ -40,4 +33,4 @@ let str = "{\
 //     // 4.关闭数据库
 //     config.end();
 // }
-exports.pool = mysql.createPool(str);
+exports.pool = mysql.createPool(config);

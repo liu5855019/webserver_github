@@ -1,16 +1,13 @@
 import express from 'express';
+import net from 'net'
 
 const app = express();
 
-var user = require('./Script/Api/User')
-var other = require('./Script/other')
-var uploadFile = require('./Script/UploadFile')
-var role = require('./Script/Api/Role')
-
-var hello = require('./build/Hello')
+var bodyParser = require('body-parser');  // body json 解析
 
 
-var bodyParser = require('body-parser');
+var hello = require('./Script/Api/Hello');
+var user = require('./Script/Api/User');
 
 
 
@@ -41,11 +38,13 @@ app.use(express.static('public'),function(req, res, next) {
     next();
 });
 
-app.use('/user', user);
-app.use('/role',role);
-app.use('/other',other);
-app.use('/upload',uploadFile);
+
 app.use('/hello',hello);
+app.use('/user',user);
+
+
+
+
 
 app.get("/",function (request , response) {
     
@@ -64,5 +63,5 @@ app.get("/uploadScore", function (request , response) {
 
 let server = app.listen(3000 , ()=>{
     console.log(new Date());
-    console.log("Server is begin at port:" + server.address());
+    console.log("Server is begin at port:" + (<net.AddressInfo>server.address()).port);
 });
