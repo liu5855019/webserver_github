@@ -8,6 +8,7 @@ const app = express_1.default();
 var bodyParser = require('body-parser'); // body json 解析
 var hello = require('./Script/Api/Hello');
 var user = require('./Script/Api/User');
+var dept = require('./Script/Api/Dept');
 app.all('*', function (req, res, next) {
     console.log(new Date() + " : " + req.url);
     res.header("Access-Control-Allow-Origin", "*");
@@ -28,6 +29,7 @@ app.use(express_1.default.static('public'), function (req, res, next) {
 });
 app.use('/hello', hello);
 app.use('/user', user);
+app.use('/dept', dept);
 app.get("/", function (request, response) {
     response.send("hello world");
 });

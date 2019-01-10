@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');  // body json 解析
 
 var hello = require('./Script/Api/Hello');
 var user = require('./Script/Api/User');
-
+var dept = require('./Script/Api/Dept')
 
 
 
@@ -41,6 +41,7 @@ app.use(express.static('public'),function(req, res, next) {
 
 app.use('/hello',hello);
 app.use('/user',user);
+app.use('/dept',dept);
 
 
 

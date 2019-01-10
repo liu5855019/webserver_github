@@ -5,8 +5,8 @@ import { IRoute, Router } from 'express-serve-static-core';
 let router:Router = express.Router();
 
 import {pool}  from "../Global/DBConfig";
-
 import {DMTools} from "../Global/DMTools";
+
 import { PoolConnection } from 'mysql';
 
 var md5 = require('../../JSTools/Md5');
