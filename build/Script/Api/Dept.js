@@ -76,6 +76,78 @@ router.post('/companyList', function (req, res) {
         });
     });
 });
+router.post('/createDepartment', function (req, res) {
+    let query = req.body;
+    console.log(query);
+    var departmentName = query.departmentName;
+    var companyGuid = query.companyGuid;
+    if (!departmentName) {
+        res.send({
+            "code": 201,
+            "msg": "Department name cannot null",
+            "obj": null
+        });
+        return;
+    }
+    if (departmentName.length < 2) {
+        res.send({
+            "code": 202,
+            "msg": "Company name is too short",
+            "obj": null
+        });
+        return;
+    }
+    if (departmentName.length > 15) {
+        res.send({
+            "code": 203,
+            "msg": "Company name is too long",
+            "obj": null
+        });
+        return;
+    }
+    if (!companyGuid || companyGuid.length < 15) {
+        res.send({
+            "code": 204,
+            "msg": "Wrong company guid",
+            "obj": null
+        });
+        return;
+    }
+    DBConfig_1.pool.getConnection(function (err, connection) {
+        if (err) {
+            res.status(500).send(err);
+            return;
+        }
+        Project_1.Project.getuser(req, connection, res, function (user) {
+            createDept(departmentName, companyGuid, user.guid, connection, res, function (result) {
+                res.send({
+                    "code": 200,
+                    "msg": "Success",
+                    "obj": null
+                });
+            });
+        });
+    });
+});
+router.post('/departmentList', function (req, res) {
+    DBConfig_1.pool.getConnection(function (err, connection) {
+        if (err) {
+            if (err) {
+                res.status(500).send(err);
+                return;
+            }
+        }
+        Project_1.Project.getuser(req, connection, res, function (user) {
+            deptList(connection, res, function (result) {
+                res.send({
+                    "code": 200,
+                    "msg": "Success",
+                    "obj": result
+                });
+            });
+        });
+    });
+});
 function createCompany(companyName, createrGuid, connection, res, callback) {
     let values = [DMTools_1.DMTools.guid(), companyName, createrGuid, new Date()];
     connection.query('INSERT INTO company(guid,company_name,creater,create_time) VALUES(?,?,?,?)', values, function (err, result) {
@@ -97,22 +169,25 @@ function companyList(connection, res, callback) {
         }
     });
 }
-// function createRole(role_name,createrGuid,connection,res,callback) {
-//     connection.query('INSERT INTO role(guid,role_name,creater,create_time) VALUES(?,?,?,?)',[dmtools.guid(),role_name,createrGuid,new Date()], function (err, result) {
-//         if (err) {
-//             res.send(500,err);
-//         } else {
-//             callback(result);
-//         }
-//     });
-// }
-// function checkRole(role_name,connection,res,callback) {
-//     connection.query('SELECT * FROM role WHERE role_name = ?' , role_name , function (err,result) {    
-//         if (err) {
-//             res.send(500,err);
-//         } else {
-//             callback(result);
-//         }
-//     });
-// }
+function createDept(department_name, company_guid, createrGuid, connection, res, callback) {
+    let values = [DMTools_1.DMTools.guid(), department_name, company_guid, createrGuid, new Date()];
+    connection.query('INSERT INTO department(guid,department_name,company_guid,creater,create_time) VALUES(?,?,?,?,?)', values, function (err, result) {
+        if (err) {
+            res.send(500, err);
+        }
+        else {
+            callback(result);
+        }
+    });
+}
+function deptList(connection, res, callback) {
+    connection.query('SELECT * FROM department', function (err, result) {
+        if (err) {
+            res.send(500, err);
+        }
+        else {
+            callback(result);
+        }
+    });
+}
 module.exports = router;
