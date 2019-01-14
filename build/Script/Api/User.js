@@ -56,16 +56,17 @@ router.post('/regist', function (req, res) {
                     "msg": "This user is exist",
                     "obj": null
                 });
+                connection.release();
                 return;
             }
             //注册
             register(connection, username, password, res, function (result) {
-                console.log(result);
                 res.send({
                     "code": 200,
                     "msg": "success",
                     "obj": {}
                 });
+                connection.release();
             });
         });
     });
@@ -124,6 +125,7 @@ router.post('/login', function (req, res) {
                                 "time": timeInterval
                             }
                         });
+                        connection.release();
                     });
                 }
                 else {
@@ -132,6 +134,7 @@ router.post('/login', function (req, res) {
                         "msg": "Wrong password",
                         "obj": {}
                     });
+                    connection.release();
                 }
             }
             else {
@@ -140,6 +143,7 @@ router.post('/login', function (req, res) {
                     "msg": "This user is not exist",
                     "obj": {}
                 });
+                connection.release();
             }
         });
     });
@@ -148,6 +152,7 @@ function checkUser(connection, username, res, callback) {
     connection.query('SELECT * FROM account WHERE username = ?', username, function (err, result) {
         if (err) {
             res.status(500).send(err);
+            connection.release();
         }
         else {
             callback(result);
@@ -158,6 +163,7 @@ function register(connection, username, password, res, callback) {
     connection.query('INSERT INTO account(guid,username,password,create_time) VALUES(?,?,?,?)', [DMTools_1.DMTools.guid(), username, password, new Date()], function (err, result) {
         if (err) {
             res.send(500, err);
+            connection.release();
         }
         else {
             callback(result);
@@ -169,6 +175,7 @@ function login(connection, username, token, token_time, res, callback) {
     connection.query('UPDATE account SET token = ? , token_time = ? WHERE username = ?', [token, token_time, username], function (err, result) {
         if (err) {
             res.send(500, err);
+            connection.release();
         }
         else {
             callback(result);

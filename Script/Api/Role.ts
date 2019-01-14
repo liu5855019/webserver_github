@@ -59,7 +59,8 @@ router.post('/createRole', function (req , res)
                     "code":200,
                     "msg":"Success",
                     "obj":null
-                })
+                });
+                connection.release();
             });
         });
     });
@@ -80,6 +81,7 @@ router.post('/roleList', function (req,res) {
                     "msg":"Success",
                     "obj":result
                 });
+                connection.release();
             });
         });
     });
@@ -96,6 +98,7 @@ function createRole(role_name:string , createrGuid:string , connection:PoolConne
     connection.query('INSERT INTO role(guid,role_name,creater,create_time) VALUES(?,?,?,?)', values , function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }
@@ -107,6 +110,7 @@ function companyList(connection:PoolConnection ,  res:any ,  callback:(result:an
     connection.query('SELECT * FROM role',function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }

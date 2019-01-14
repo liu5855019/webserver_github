@@ -12,6 +12,7 @@ export class Project {
         connection.query('SELECT * FROM account WHERE token = ?',token,function (err,result) {
             if (err) {
                 res.send(500,err);
+                connection.release();
                 return;
             } 
             if (result.length) {
@@ -27,6 +28,7 @@ export class Project {
                         "msg":"This token is not exist or overdue",
                         "obj":{}
                     });
+                    connection.release();
                 }
             } else {
                 res.send({
@@ -34,6 +36,7 @@ export class Project {
                     "msg":"This token is not exist or overdue",
                     "obj":{}
                 });
+                connection.release();
             }
         })
     }

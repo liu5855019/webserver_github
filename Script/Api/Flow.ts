@@ -66,6 +66,7 @@ router.post('/createFlow', function (req , res)
                     "msg":"Success",
                     "obj":null
                 });
+                connection.release();
             });
         });
     });
@@ -86,6 +87,7 @@ router.post('/roleList', function (req,res) {
                     "msg":"Success",
                     "obj":result
                 });
+                connection.release();
             });
         });
     });
@@ -102,6 +104,7 @@ function createFlow(flow_name:string , module_guid:string , flow:string , create
     connection.query('INSERT INTO flow(guid,flow_name,module_guid,flow,creater,create_time) VALUES(?,?,?,?,?,?)', values , function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }
@@ -113,6 +116,7 @@ function companyList(connection:PoolConnection ,  res:any ,  callback:(result:an
     connection.query('SELECT * FROM role',function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }

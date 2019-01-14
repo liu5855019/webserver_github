@@ -53,6 +53,7 @@ router.post('/createCompany', function (req, res) {
                     "msg": "Success",
                     "obj": null
                 });
+                connection.release();
             });
         });
     });
@@ -72,6 +73,7 @@ router.post('/companyList', function (req, res) {
                     "msg": "Success",
                     "obj": result
                 });
+                connection.release();
             });
         });
     });
@@ -125,6 +127,7 @@ router.post('/createDepartment', function (req, res) {
                     "msg": "Success",
                     "obj": null
                 });
+                connection.release();
             });
         });
     });
@@ -144,6 +147,7 @@ router.post('/departmentList', function (req, res) {
                     "msg": "Success",
                     "obj": result
                 });
+                connection.release();
             });
         });
     });
@@ -153,6 +157,7 @@ function createCompany(companyName, createrGuid, connection, res, callback) {
     connection.query('INSERT INTO company(guid,company_name,creater,create_time) VALUES(?,?,?,?)', values, function (err, result) {
         if (err) {
             res.send(500, err);
+            connection.release();
         }
         else {
             callback(result);
@@ -163,6 +168,7 @@ function companyList(connection, res, callback) {
     connection.query('SELECT * FROM company', function (err, result) {
         if (err) {
             res.send(500, err);
+            connection.release();
         }
         else {
             callback(result);
@@ -174,6 +180,7 @@ function createDept(department_name, company_guid, createrGuid, connection, res,
     connection.query('INSERT INTO department(guid,department_name,company_guid,creater,create_time) VALUES(?,?,?,?,?)', values, function (err, result) {
         if (err) {
             res.send(500, err);
+            connection.release();
         }
         else {
             callback(result);
@@ -184,6 +191,7 @@ function deptList(connection, res, callback) {
     connection.query('SELECT * FROM department', function (err, result) {
         if (err) {
             res.send(500, err);
+            connection.release();
         }
         else {
             callback(result);

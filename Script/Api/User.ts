@@ -63,16 +63,17 @@ router.post('/regist', function (req , res) {
                     "msg":"This user is exist",
                     "obj":null
                 });
+                connection.release();
                 return;
             } 
             //注册
             register(connection,username,password,res,function (result) {
-                console.log(result);
                 res.send({
                     "code":200,
                     "msg":"success",
                     "obj":{}
-                });     
+                }); 
+                connection.release();    
             });
         });
     });
@@ -114,7 +115,6 @@ router.post('/login',function (req,res) {
         return;
     }
 
-    
 
     pool.getConnection(function (err,connection) {  // 链接数据库
         if (err) {
@@ -143,6 +143,7 @@ router.post('/login',function (req,res) {
                                 "time":timeInterval
                             }
                         });
+                        connection.release();
                     });
                 } else {
                     res.send({
@@ -150,6 +151,7 @@ router.post('/login',function (req,res) {
                         "msg":"Wrong password",
                         "obj":{}
                     });
+                    connection.release();
                 }
             } else {
                 res.send({
@@ -157,6 +159,7 @@ router.post('/login',function (req,res) {
                     "msg":"This user is not exist",
                     "obj":{}
                 });
+                connection.release();
             }
         });
     });
@@ -171,6 +174,7 @@ function checkUser(connection:PoolConnection , username:string , res:any , callb
     connection.query('SELECT * FROM account WHERE username = ?' , username , function (err,result) {    
         if (err) {
             res.status(500).send(err);
+            connection.release();
         } else {
             callback(result);
         }
@@ -181,6 +185,7 @@ function register(connection:PoolConnection , username:string , password:string 
     connection.query('INSERT INTO account(guid,username,password,create_time) VALUES(?,?,?,?)',[DMTools.guid(),username,password,new Date()], function (err, result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }
@@ -192,6 +197,7 @@ function login(connection:PoolConnection , username:string , token:string , toke
     connection.query('UPDATE account SET token = ? , token_time = ? WHERE username = ?',[token,token_time,username],function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }

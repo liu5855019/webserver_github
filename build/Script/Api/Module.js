@@ -53,6 +53,7 @@ router.post('/createModule', function (req, res) {
                     "msg": "Success",
                     "obj": null
                 });
+                connection.release();
             });
         });
     });
@@ -72,6 +73,7 @@ router.post('/moduleList', function (req, res) {
                     "msg": "Success",
                     "obj": result
                 });
+                connection.release();
             });
         });
     });
@@ -81,6 +83,7 @@ function createModule(module_name, createrGuid, connection, res, callback) {
     connection.query('INSERT INTO module(guid,module_name,creater,create_time) VALUES(?,?,?,?)', values, function (err, result) {
         if (err) {
             res.send(500, err);
+            connection.release();
         }
         else {
             callback(result);
@@ -91,6 +94,7 @@ function moduleList(connection, res, callback) {
     connection.query('SELECT * FROM module', function (err, result) {
         if (err) {
             res.send(500, err);
+            connection.release();
         }
         else {
             callback(result);

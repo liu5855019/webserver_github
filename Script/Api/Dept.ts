@@ -59,14 +59,14 @@ router.post('/createCompany', function (req , res)
                     "code":200,
                     "msg":"Success",
                     "obj":null
-                })
+                });
+                connection.release();
             });
         });
     });
 });
 
 router.post('/companyList', function (req,res) {
-
     pool.getConnection(function (err,connection) {
         if (err) {
             if (err) {
@@ -81,10 +81,10 @@ router.post('/companyList', function (req,res) {
                     "msg":"Success",
                     "obj":result
                 });
+                connection.release();
             });
         });
     });
-
 });
 
 router.post('/createDepartment', function (req , res) 
@@ -143,7 +143,8 @@ router.post('/createDepartment', function (req , res)
                     "code":200,
                     "msg":"Success",
                     "obj":null
-                })
+                });
+                connection.release();
             });
         });
     });
@@ -151,7 +152,6 @@ router.post('/createDepartment', function (req , res)
 
 
 router.post('/departmentList', function (req,res) {
-
     pool.getConnection(function (err,connection) {
         if (err) {
             if (err) {
@@ -166,10 +166,10 @@ router.post('/departmentList', function (req,res) {
                     "msg":"Success",
                     "obj":result
                 });
+                connection.release();
             });
         });
     });
-
 });
 
 
@@ -181,6 +181,7 @@ function createCompany(companyName:string , createrGuid:string , connection:Pool
     connection.query('INSERT INTO company(guid,company_name,creater,create_time) VALUES(?,?,?,?)', values , function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }
@@ -192,6 +193,7 @@ function companyList(connection:PoolConnection ,  res:any ,  callback:(result:an
     connection.query('SELECT * FROM company',function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }
@@ -204,6 +206,7 @@ function createDept(department_name:string , company_guid:string , createrGuid:s
     connection.query('INSERT INTO department(guid,department_name,company_guid,creater,create_time) VALUES(?,?,?,?,?)', values , function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }
@@ -215,6 +218,7 @@ function deptList(connection:PoolConnection ,  res:any ,  callback:(result:any)=
     connection.query('SELECT * FROM department',function (err,result) {
         if (err) {
             res.send(500,err);
+            connection.release();
         } else {
             callback(result);
         }
