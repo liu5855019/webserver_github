@@ -4,6 +4,7 @@ import { PoolConnection } from "mysql";
 export class Project {
     constructor() {
     }
+
     static getuser(req:any , connection:PoolConnection , res:any , callback:(user:any)=>void) {
 
         let token = req.headers.token;
@@ -36,5 +37,7 @@ export class Project {
             }
         })
     }
+
+    
 }
 

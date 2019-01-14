@@ -7,7 +7,6 @@ import {DMTools} from "../Global/DMTools";
 import {Project} from "../Global/Project";
 
 import { PoolConnection } from 'mysql';
-import { callbackify } from 'util';
 
 var md5 = require('../../JSTools/Md5');
 
