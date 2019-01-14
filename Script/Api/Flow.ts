@@ -20,7 +20,7 @@ router.post('/createFlow', function (req , res)
 
     var flow_name = query.flow_name;
     var module_guid = query.module_guid;
-    var flows : [String] = query.flows;
+    var flows : [string] = query.flows;
 
     var flow =  flows.join(',');
  
@@ -60,7 +60,7 @@ router.post('/createFlow', function (req , res)
         }
 
         Project.getuser(req,connection,res,function (user) { 
-            createFlow(flow_name,module_guid,flow,user.guid,connection,res,function (result) {
+            createFlow(flow_name,module_guid,flows[0],flow,user.guid,connection,res,function (result) {
                 res.send({
                     "code":200,
                     "msg":"Success",
@@ -72,7 +72,7 @@ router.post('/createFlow', function (req , res)
     });
 });
 
-router.post('/roleList', function (req,res) {
+router.post('/flowList', function (req,res) {
     pool.getConnection(function (err,connection) {
         if (err) {
             if (err) {
@@ -98,10 +98,10 @@ router.post('/roleList', function (req,res) {
 
 
 
-function createFlow(flow_name:string , module_guid:string , flow:string , createrGuid:string , connection:PoolConnection ,  res:any ,  callback:(result:any)=>void)
+function createFlow(flow_name:string , module_guid:string , role_guid:string , flow:string , createrGuid:string , connection:PoolConnection ,  res:any ,  callback:(result:any)=>void)
 {
-    let values = [DMTools.guid(),flow_name,module_guid,flow,createrGuid,new Date()];
-    connection.query('INSERT INTO flow(guid,flow_name,module_guid,flow,creater,create_time) VALUES(?,?,?,?,?,?)', values , function (err,result) {
+    let values = [DMTools.guid(),flow_name,module_guid,role_guid,flow,createrGuid,new Date()];
+    connection.query('INSERT INTO flow(guid,flow_name,module_guid,role_guid,flow,creater,create_time) VALUES(?,?,?,?,?,?,?)', values , function (err,result) {
         if (err) {
             res.send(500,err);
             connection.release();
@@ -113,7 +113,7 @@ function createFlow(flow_name:string , module_guid:string , flow:string , create
 
 function companyList(connection:PoolConnection ,  res:any ,  callback:(result:any)=>void) 
 {
-    connection.query('SELECT * FROM role',function (err,result) {
+    connection.query('SELECT * FROM flow',function (err,result) {
         if (err) {
             res.send(500,err);
             connection.release();

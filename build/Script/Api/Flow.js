@@ -50,7 +50,7 @@ router.post('/createFlow', function (req, res) {
             return;
         }
         Project_1.Project.getuser(req, connection, res, function (user) {
-            createFlow(flow_name, module_guid, flow, user.guid, connection, res, function (result) {
+            createFlow(flow_name, module_guid, flows[0], flow, user.guid, connection, res, function (result) {
                 res.send({
                     "code": 200,
                     "msg": "Success",
@@ -61,7 +61,7 @@ router.post('/createFlow', function (req, res) {
         });
     });
 });
-router.post('/roleList', function (req, res) {
+router.post('/flowList', function (req, res) {
     DBConfig_1.pool.getConnection(function (err, connection) {
         if (err) {
             if (err) {
@@ -81,9 +81,9 @@ router.post('/roleList', function (req, res) {
         });
     });
 });
-function createFlow(flow_name, module_guid, flow, createrGuid, connection, res, callback) {
-    let values = [DMTools_1.DMTools.guid(), flow_name, module_guid, flow, createrGuid, new Date()];
-    connection.query('INSERT INTO flow(guid,flow_name,module_guid,flow,creater,create_time) VALUES(?,?,?,?,?,?)', values, function (err, result) {
+function createFlow(flow_name, module_guid, role_guid, flow, createrGuid, connection, res, callback) {
+    let values = [DMTools_1.DMTools.guid(), flow_name, module_guid, role_guid, flow, createrGuid, new Date()];
+    connection.query('INSERT INTO flow(guid,flow_name,module_guid,role_guid,flow,creater,create_time) VALUES(?,?,?,?,?,?,?)', values, function (err, result) {
         if (err) {
             res.send(500, err);
             connection.release();
@@ -94,7 +94,7 @@ function createFlow(flow_name, module_guid, flow, createrGuid, connection, res, 
     });
 }
 function companyList(connection, res, callback) {
-    connection.query('SELECT * FROM role', function (err, result) {
+    connection.query('SELECT * FROM flow', function (err, result) {
         if (err) {
             res.send(500, err);
             connection.release();
