@@ -69,10 +69,8 @@ router.post('/createRole', function (req , res)
 router.post('/roleList', function (req,res) {
     pool.getConnection(function (err,connection) {
         if (err) {
-            if (err) {
-                res.status(500).send(err);
-                return;
-            }
+            res.status(500).send(err);
+            return;
         }
         Project.getuser(req,connection,res,function (user) {            
             companyList(connection,res,function (result) {
