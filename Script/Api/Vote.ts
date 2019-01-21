@@ -24,74 +24,51 @@ class VoteModel {
 }
 
 
-// router.post('/updateUserInfo', function (req , res) 
-// {
-//     let query = req.body;
-//     console.log(query);
+router.post('/createVote', function (req , res) 
+{
+    let query = req.body;
+    console.log(query);
 
-//     var account_guid = query.account_guid;
-//     var user_name = query.user_name;
-//     var department_guid = query.department_guid;
-//     var role_guid = query.role_guid;
+    var title = query.title;
+    var content = query.content;
     
-//     if (!account_guid || account_guid.length < 10) {
-//         res.send({
-//             "code":201,
-//             "msg":"please gave me account guid",
-//             "obj":null
-//         });
-//         return;
-//     }
+    if (!title || title.length < 2) {
+        res.send({
+            "code":201,
+            "msg":"please gave me title",
+            "obj":null
+        });
+        return;
+    }
 
-//     if (!user_name || user_name.length < 2) {
-//         res.send({
-//             "code":202,
-//             "msg":"please gave me user name",
-//             "obj":null
-//         });
-//         return;
-//     }
+    if (!content || content.length < 2) {
+        res.send({
+            "code":202,
+            "msg":"please gave me content",
+            "obj":null
+        });
+        return;
+    }
 
-//     if (!department_guid || department_guid.length < 10) {
-//         res.send({
-//             "code":203,
-//             "msg":"please gave me department",
-//             "obj":null
-//         });
-//         return;
-//     }
-
-//     if (!role_guid || role_guid.length < 10) {
-//         res.send({
-//             "code":204,
-//             "msg":"please gave me role",
-//             "obj":null
-//         });
-//         return;
-//     }
     
-//     pool.getConnection(function (err,connection) {  // 链接数据库
-//         if (err) {
-//             res.status(500).send(err);
-//             return;
-//         }
-//         Project.getuser(req,connection,res,function (user) {            
-//             getUserInfo(account_guid,connection,res,function (userInfo) {   
-//                 userInfo.user_name = user_name;
-//                 userInfo.department_guid = department_guid;
-//                 userInfo.role_guid = role_guid; 
-//                 createOrUpdateUserInof(userInfo,user.guid,connection,res,function (result) {
-//                     res.send({
-//                         "code":200,
-//                         "msg":"Success",
-//                         "obj":result
-//                     });
-//                     connection.release();
-//                 });
-//             });
-//         });
-//     });
-// });
+    
+    pool.getConnection(function (err,connection) {  // 链接数据库
+        if (err) {
+            res.status(500).send(err);
+            return;
+        }
+        Project.getuser(req,connection,res,function (user) {        
+            createVote(title,content,flow,user.guid,connection,res,function (vote_guid) {
+                res.send({
+                    "code":200,
+                    "msg":"Success",
+                    "obj":null
+                });
+                connection.release();
+            });
+        });
+    });
+});
 
 // router.post('/userInfo', function (req,res) {
 //     let query = req.body;
@@ -144,6 +121,41 @@ class VoteModel {
 //         });
 //     });
 // });
+
+
+
+
+function createVote(title:string , content:string , flow:string , createrGuid:string , connection:PoolConnection ,  res:any ,  callback:(vote_guid:string)=>void)
+{
+    var sql = "INSERT INTO vote (guid,title,content,flow,current_node,creater,create_time) VALUES(?,?,?,?,?,?,?)";
+    var guid = DMTools.guid();
+    var values = [guid,title,content,flow,1,createrGuid,new Date()];
+
+    connection.query(sql, values , function (err,result) {
+        if (err) {
+            res.send(500,err);
+            connection.release();
+        } else {
+            callback(guid);
+        }
+    });
+}
+
+function createVoteItem(vote_guid:string , item:string , createrGuid:string , connection:PoolConnection ,  res:any ,  callback:(result:any)=>void)
+{
+    var sql = "INSERT INTO vote_item (guid,vote_guid,item,creater,create_time) VALUES(?,?,?,?,?)";
+    
+    var values = [DMTools.guid(),vote_guid,item,createrGuid,new Date()];
+
+    connection.query(sql, values , function (err,result) {
+        if (err) {
+            res.send(500,err);
+            connection.release();
+        } else {
+            callback(result);
+        }
+    });
+}
 
 
 
