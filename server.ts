@@ -12,7 +12,9 @@ var dept = require('./Script/Api/Dept');
 var role = require('./Script/Api/Role');
 var module_route = require('./Script/Api/Module');
 var flow = require('./Script/Api/Flow');
-var userInfo = require('./Script/Api/UserInfo')
+var userInfo = require('./Script/Api/UserInfo');
+var vote = require('./Script/Api/Vote');
+
 
 
 
@@ -49,6 +51,7 @@ app.use('/role',role);
 app.use('/module',module_route);
 app.use('/flow',flow);
 app.use('/userInfo',userInfo);
+app.use('/vote',vote);
 
 
 

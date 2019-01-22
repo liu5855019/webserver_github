@@ -46,7 +46,7 @@ router.post('/createCompany', function (req, res) {
             res.status(500).send(err);
             return;
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
             createCompany(companyName, user.guid, connection, res, function (result) {
                 res.send({
                     "code": 200,
@@ -66,7 +66,7 @@ router.post('/companyList', function (req, res) {
                 return;
             }
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
             companyList(connection, res, function (result) {
                 res.send({
                     "code": 200,
@@ -120,7 +120,7 @@ router.post('/createDepartment', function (req, res) {
             res.status(500).send(err);
             return;
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
             createDept(departmentName, companyGuid, user.guid, connection, res, function (result) {
                 res.send({
                     "code": 200,
@@ -140,7 +140,7 @@ router.post('/departmentList', function (req, res) {
                 return;
             }
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
             deptList(connection, res, function (result) {
                 res.send({
                     "code": 200,

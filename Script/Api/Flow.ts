@@ -59,7 +59,7 @@ router.post('/createFlow', function (req , res)
             return;
         }
 
-        Project.getuser(req,connection,res,function (user) { 
+        Project.getUser(req,connection,res,function (user) { 
             createFlow(flow_name,module_guid,flows[0],flow,user.guid,connection,res,function (result) {
                 res.send({
                     "code":200,
@@ -80,7 +80,7 @@ router.post('/flowList', function (req,res) {
                 return;
             }
         }
-        Project.getuser(req,connection,res,function (user) {            
+        Project.getUser(req,connection,res,function (user) {            
             companyList(connection,res,function (result) {
                 res.send({
                     "code":200,

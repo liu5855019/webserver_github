@@ -19,6 +19,7 @@ router.post('/createModule', function (req , res)
     console.log(query);
 
     var module_name = query.module_name;
+    var identify = query.identify;
     
     if (!module_name) {
         res.send({
@@ -46,6 +47,15 @@ router.post('/createModule', function (req , res)
         });
         return;
     }
+
+    if (!identify || identify.length < 2) {
+        res.send({
+            "code":204,
+            "msg":"Please gave me identify",
+            "obj":null
+        });
+        return;
+    }
     
     pool.getConnection(function (err,connection) {  // 链接数据库
         if (err) {
@@ -53,8 +63,8 @@ router.post('/createModule', function (req , res)
             return;
         }
 
-        Project.getuser(req,connection,res,function (user) {            
-            createModule(module_name,user.guid,connection,res,function (result) {
+        Project.getUser(req,connection,res,function (user) {            
+            createModule(module_name,identify,user.guid,connection,res,function (result) {
                 res.send({
                     "code":200,
                     "msg":"Success",
@@ -74,7 +84,7 @@ router.post('/moduleList', function (req,res) {
                 return;
             }
         }
-        Project.getuser(req,connection,res,function (user) {            
+        Project.getUser(req,connection,res,function (user) {            
             moduleList(connection,res,function (result) {
                 res.send({
                     "code":200,
@@ -92,10 +102,10 @@ router.post('/moduleList', function (req,res) {
 
 
 
-function createModule(module_name:string , createrGuid:string , connection:PoolConnection ,  res:any ,  callback:(result:any)=>void)
+function createModule(module_name:string , identify:string , createrGuid:string , connection:PoolConnection ,  res:any ,  callback:(result:any)=>void)
 {
-    let values = [DMTools.guid(),module_name,createrGuid,new Date()];
-    connection.query('INSERT INTO module(guid,module_name,creater,create_time) VALUES(?,?,?,?)', values , function (err,result) {
+    let values = [DMTools.guid() , module_name , identify , createrGuid , new Date()];
+    connection.query('INSERT INTO module(guid,module_name,identify,creater,create_time) VALUES(?,?,?,?,?)', values , function (err,result) {
         if (err) {
             res.send(500,err);
             connection.release();

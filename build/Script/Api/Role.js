@@ -46,7 +46,7 @@ router.post('/createRole', function (req, res) {
             res.status(500).send(err);
             return;
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
             createRole(role_name, user.guid, connection, res, function (result) {
                 res.send({
                     "code": 200,
@@ -64,7 +64,7 @@ router.post('/roleList', function (req, res) {
             res.status(500).send(err);
             return;
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
             companyList(connection, res, function (result) {
                 res.send({
                     "code": 200,

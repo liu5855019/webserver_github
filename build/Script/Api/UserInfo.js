@@ -23,7 +23,37 @@ class UserInfoModel {
         this.role_guid = "";
         this.role_name = "";
     }
+    static getUserInfo(account_guid, connection, res, callback) {
+        let sql = "SELECT * FROM user u \
+        LEFT JOIN department d on u.department_guid = d.guid \
+        LEFT JOIN role r ON u.role_guid = r.guid \
+        where u.account_guid = ?";
+        connection.query(sql, account_guid, function (err, result) {
+            if (err) {
+                res.send(500, err);
+                connection.release();
+            }
+            else {
+                let user = new UserInfoModel();
+                user.account_guid = account_guid;
+                if (result.length) {
+                    let tmpUser = result[0];
+                    user.guid = tmpUser.guid;
+                    user.department_guid = tmpUser.department_guid;
+                    user.department_name = tmpUser.department_name;
+                    user.role_guid = tmpUser.role_guid;
+                    user.role_name = tmpUser.role_name;
+                    user.user_name = tmpUser.user_name;
+                    callback(user);
+                }
+                else {
+                    callback(user);
+                }
+            }
+        });
+    }
 }
+exports.UserInfoModel = UserInfoModel;
 router.post('/updateUserInfo', function (req, res) {
     let query = req.body;
     console.log(query);
@@ -68,8 +98,8 @@ router.post('/updateUserInfo', function (req, res) {
             res.status(500).send(err);
             return;
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
-            getUserInfo(account_guid, connection, res, function (userInfo) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
+            UserInfoModel.getUserInfo(account_guid, connection, res, function (userInfo) {
                 userInfo.user_name = user_name;
                 userInfo.department_guid = department_guid;
                 userInfo.role_guid = role_guid;
@@ -102,8 +132,8 @@ router.post('/userInfo', function (req, res) {
             res.status(500).send(err);
             return;
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
-            getUserInfo(account_guid, connection, res, function (result) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
+            UserInfoModel.getUserInfo(account_guid, connection, res, function (result) {
                 res.send({
                     "code": 200,
                     "msg": "Success",
@@ -120,7 +150,7 @@ router.post('/accountList', function (req, res) {
             res.status(500).send(err);
             return;
         }
-        Project_1.Project.getuser(req, connection, res, function (user) {
+        Project_1.Project.getUser(req, connection, res, function (user) {
             getAccountList(connection, res, function (result) {
                 res.send({
                     "code": 200,
@@ -150,35 +180,6 @@ function createOrUpdateUserInof(userInfo, createrGuid, connection, res, callback
         }
         else {
             callback(result);
-        }
-    });
-}
-function getUserInfo(account_guid, connection, res, callback) {
-    let sql = "SELECT * FROM user u \
-    LEFT JOIN department d on u.department_guid = d.guid \
-    LEFT JOIN role r ON u.role_guid = r.guid \
-    where u.account_guid = ?";
-    connection.query(sql, account_guid, function (err, result) {
-        if (err) {
-            res.send(500, err);
-            connection.release();
-        }
-        else {
-            let user = new UserInfoModel();
-            user.account_guid = account_guid;
-            if (result.length) {
-                let tmpUser = result[0];
-                user.guid = tmpUser.guid;
-                user.department_guid = tmpUser.department_guid;
-                user.department_name = tmpUser.department_name;
-                user.role_guid = tmpUser.role_guid;
-                user.role_name = tmpUser.role_name;
-                user.user_name = tmpUser.user_name;
-                callback(user);
-            }
-            else {
-                callback(user);
-            }
         }
     });
 }
