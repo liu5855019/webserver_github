@@ -13,3 +13,5 @@ npm install mysql
 
 
 
+#安装 websocket
+npm install nodejs-websocket

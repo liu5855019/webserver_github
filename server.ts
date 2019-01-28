@@ -1,6 +1,9 @@
 import express from 'express';
 import net from 'net'
 
+
+
+
 const app = express();
 
 var bodyParser = require('body-parser');  // body json 解析
@@ -75,3 +78,47 @@ let server = app.listen(3000 , ()=>{
     console.log(new Date());
     console.log("Server is begin at port:" + (<net.AddressInfo>server.address()).port);
 });
+
+
+
+
+
+
+var ws = require("nodejs-websocket");
+console.log("开始建立连接...")
+
+var game1 : any = null ;
+var game2 : any = null ;
+var game1Ready = false ;
+var game2Ready = false;
+
+var wsServer = ws.createServer(function(conn:any){
+    conn.on("text", function (str : string) {
+        console.log("收到的信息为:"+str)
+        if(str==="game1"){
+            game1 = conn;
+            game1Ready = true;
+            conn.sendText("success");
+        }
+        if(str==="game2"){
+            game2 = conn;
+            game2Ready = true;
+        }
+
+        if(game1Ready&&game2Ready){
+            game2.sendText(str);
+        }
+
+        conn.sendText(str)
+    })
+    conn.on("close", function (code:any, reason:any) {
+        console.log("关闭连接")
+    });
+    conn.on("error", function (code:any, reason:any) {
+        console.log("异常关闭")
+    });
+}).listen(8001)
+console.log("WebSocket建立完毕")
+
+
+
