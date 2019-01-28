@@ -43,6 +43,14 @@ app.use('/vote', vote);
 app.get("/", function (request, response) {
     response.send("hello world");
 });
+// app.engine('handlebars', handlebars.engine); // 将express模板引擎配置成handlebars 
+// app.set('view engine', 'handlebars');
+// view engine setup
+app.set('views', './public/web');
+app.set('view engine', 'ejs');
+app.get("/index", function (req, res) {
+    res.render('index');
+});
 app.get("/uploadScore", function (request, response) {
     console.log("访问了/uploadScore");
     console.log(request.query);
@@ -52,34 +60,42 @@ let server = app.listen(3000, () => {
     console.log(new Date());
     console.log("Server is begin at port:" + server.address().port);
 });
-var ws = require("nodejs-websocket");
-console.log("开始建立连接...");
-var game1 = null;
-var game2 = null;
-var game1Ready = false;
-var game2Ready = false;
-var wsServer = ws.createServer(function (conn) {
-    conn.on("text", function (str) {
-        console.log("收到的信息为:" + str);
-        if (str === "game1") {
-            game1 = conn;
-            game1Ready = true;
-            conn.sendText("success");
-        }
-        if (str === "game2") {
-            game2 = conn;
-            game2Ready = true;
-        }
-        if (game1Ready && game2Ready) {
-            game2.sendText(str);
-        }
-        conn.sendText(str);
+const ws_1 = __importDefault(require("ws"));
+console.log("开始建立连接..." + new Date());
+const wss = new ws_1.default.Server({
+    port: 3001,
+    perMessageDeflate: {
+        zlibDeflateOptions: {
+            // See zlib defaults.
+            chunkSize: 1024,
+            memLevel: 7,
+            level: 3
+        },
+        // Other options settable:
+        clientNoContextTakeover: true,
+        serverNoContextTakeover: true,
+        serverMaxWindowBits: 10,
+        // Below options specified as default values.
+        concurrencyLimit: 10,
+        threshold: 1024 // Size (in bytes) below which messages
+        // should not be compressed.
+    }
+});
+wss.on('connection', function connection(socket, request) {
+    console.log(socket + "is connection");
+    console.log(request);
+    socket.on('message', function incoming(message) {
+        console.log('received: %s', message);
     });
-    conn.on("close", function (code, reason) {
-        console.log("关闭连接");
+    socket.on('close', function close(code, reason) {
+        console.log('close: ' + code + " reason: " + reason);
     });
-    conn.on("error", function (code, reason) {
-        console.log("异常关闭");
+    socket.on('open', function open() {
+        console.log('open');
     });
-}).listen(8001);
-console.log("WebSocket建立完毕");
+    socket.on('error', function error(err) {
+        console.log(err);
+    });
+    socket.send('11111');
+});
+console.log("建立连接完成" + new Date());

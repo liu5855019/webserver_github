@@ -64,6 +64,18 @@ app.get("/",function (request , response) {
     response.send("hello world");
 });
 
+// app.engine('handlebars', handlebars.engine); // 将express模板引擎配置成handlebars 
+// app.set('view engine', 'handlebars');
+
+// view engine setup
+app.set('views','./public/web');
+app.set('view engine', 'ejs');
+
+app.get("/index",function (req , res) {
+    
+    res.render('index');
+});
+
 app.get("/uploadScore", function (request , response) {
     console.log("访问了/uploadScore");
     console.log(request.query);
@@ -80,45 +92,51 @@ let server = app.listen(3000 , ()=>{
 });
 
 
+import ws from 'ws'
 
+console.log("开始建立连接..." + new Date());
 
+const wss = new ws.Server({
+    port: 3001,
+    perMessageDeflate: {
+      zlibDeflateOptions: {
+        // See zlib defaults.
+        chunkSize: 1024,
+        memLevel: 7,
+        level: 3
+      },
+      
+      // Other options settable:
+      clientNoContextTakeover: true, // Defaults to negotiated value.
+      serverNoContextTakeover: true, // Defaults to negotiated value.
+      serverMaxWindowBits: 10, // Defaults to negotiated value.
+      // Below options specified as default values.
+      concurrencyLimit: 10, // Limits zlib concurrency for perf.
+      threshold: 1024 // Size (in bytes) below which messages
+      // should not be compressed.
+    }
+  });
 
+  wss.on('connection' , function connection(socket,request) {
+        console.log(socket + "is connection");
+        console.log(request);
 
-var ws = require("nodejs-websocket");
-console.log("开始建立连接...")
+        socket.on('message',function incoming(message){
+            console.log('received: %s', message);
+        });
+        socket.on('close',function close(code,reason){
+            console.log('close: ' + code + " reason: " + reason);
+        });
+        socket.on('open' , function open() {
+            console.log('open');
+        });
+        socket.on('error', function error(err){
+            console.log(err);
+        });
 
-var game1 : any = null ;
-var game2 : any = null ;
-var game1Ready = false ;
-var game2Ready = false;
+        socket.send('11111');     
+  });
 
-var wsServer = ws.createServer(function(conn:any){
-    conn.on("text", function (str : string) {
-        console.log("收到的信息为:"+str)
-        if(str==="game1"){
-            game1 = conn;
-            game1Ready = true;
-            conn.sendText("success");
-        }
-        if(str==="game2"){
-            game2 = conn;
-            game2Ready = true;
-        }
-
-        if(game1Ready&&game2Ready){
-            game2.sendText(str);
-        }
-
-        conn.sendText(str)
-    })
-    conn.on("close", function (code:any, reason:any) {
-        console.log("关闭连接")
-    });
-    conn.on("error", function (code:any, reason:any) {
-        console.log("异常关闭")
-    });
-}).listen(8001)
-console.log("WebSocket建立完毕")
-
+  console.log("建立连接完成" + new Date())
 
 
