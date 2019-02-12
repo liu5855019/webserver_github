@@ -1,10 +1,7 @@
 {
 	"folders": [
-        {
-            "path": "."
-        },
-        {
-            "path": "/Users/imac-03/Downloads/editor.md-master/examples/css"
-        }
-    ]
+		{
+			"path": "."
+		}
+	]
 }
