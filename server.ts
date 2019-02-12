@@ -119,7 +119,7 @@ const wss = new ws.Server({
 
   wss.on('connection' , function connection(socket,request) {
         console.log(socket + "is connection");
-        console.log(request);
+        console.log(request.headers);
 
         socket.on('message',function incoming(message){
             console.log('received: %s', message);
