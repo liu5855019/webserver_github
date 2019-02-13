@@ -116,10 +116,16 @@ function connectContent() {
     var strArr = [];
 
     for (let index = 0; index < docContents.length; index++) {
+        //debugger;
         const docContent = docContents[index];
         content = docContent.content;
-        tmpArr = content.split("\n");
-        strArr.splice(docContent.begin_line,docContent.end_line - docContent.begin_line + 1,tmpArr);
+        if (content!=null) {
+            strArr.splice(docContent.begin_line,docContent.end_line,content);
+        } else {
+            strArr.splice(docContent.begin_line,docContent.end_line);
+        }
+        tmpStr = strArr.join("\n");
+        strArr = tmpStr.split("\n");
     }
 
     console.log(strArr);
@@ -133,33 +139,35 @@ function compareContent() {
     strArr = str.split("\n");
     over_contents = str.split("\n");
 
+    oldArr = docStrArr;
     begin_line = 0;
     end_line = 0;
 
-    new_begin_line = 0;
-    new_end_line = 0;
-
     if (strArr.length != docStrArr.length) {
-        debugger;
+        //debugger;
         for (let index = 0; index < docStrArr.length; index++) {
             const oldStr = docStrArr[index];
             const newStr = strArr[index];
             if (oldStr != newStr) {
                 begin_line = index;
+                break;
             }
         }
 
         strArr.splice(0,begin_line);
+        oldArr.splice(0,begin_line);
 
-        for (let index = docStrArr.length-1; index >= 0; index--) {
-            const oldStr = docStrArr[index];
+        for (let index = oldArr.length-1; index >= 0; index--) {
+            const oldStr = oldArr[index];
             const newStr = strArr[strArr.length - 1];
             if (oldStr != newStr) {
-                end_line = index;
                 break;
             }
             strArr.pop();
+            oldArr.pop();
         }
+
+        end_line = oldArr.length
 
         content = null;
         if (strArr.length) {
@@ -179,18 +187,43 @@ function createContent(begin_line,end_line,content,over_contents) {
     };
 
     console.log(para);
+                 
     
-    $.post("./doc/createContent",para , function(data,status){
-        console.log(data);
-        console.log(status);
-
-        if (data.code != 200) {
+    $.ajax({
+        async:false,
+        type:"post",
+        url:"./doc/createContent",
+        data:JSON.stringify(para),
+        dataType:"json",
+        contentType: "application/json; charset=utf-8",  
+        success:function(data){
+            console.log(data);
+            if (data.code != 200) {
+                alert(data.msg);
+                return;
+            } 
+            docStrArr = over_contents;
+            console.log(over_contents);
+            console.log("保存成功");
+        },
+        error:function(data){
             alert(data.msg);
-            return;
-        } 
-        docStrArr = over_contents;
-        console.log("保存成功");
+        }
     });
+
+    
+    // $.post("./doc/createContent",para , function(data,status){
+    //     console.log(data);
+    //     console.log(status);
+
+    //     if (data.code != 200) {
+    //         alert(data.msg);
+    //         return;
+    //     } 
+    //     docStrArr = over_contents;
+    //     console.log(over_contents);
+    //     console.log("保存成功");
+    // });
 }
 
 
