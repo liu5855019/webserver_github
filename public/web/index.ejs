@@ -7,47 +7,9 @@
         <link rel="stylesheet" href="../lib/editmd_lib/css/editormd.css" />
         <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon" />
     </head>
-    
-
-<script src="../lib/js/jquery.min.js"></script>
-<script src="../lib/editmd_lib/editormd.min.js"></script>
-
-    <script type="text/javascript">
-        var testEditor;
-
-        $(function() {
-            testEditor = editormd("test-editormd", {
-                width   : "90%",
-                height  : 640,
-                syncScrolling : "single",
-                path    : "../lib/editmd_lib/lib/",
-                // theme: "dark",//工具栏主题
-                // previewTheme: "dark",//预览主题
-                // editorTheme: "pastel-on-dark",//编辑主题
-                onchange : function() {
-                    $("#output").html("onchange : this.id =>" + this.id + ", markdown =>" + this.getValue());
-                    console.log("onchange:",this.getValue());
-                } , 
-                
-            });
-        });
-
-        var wsServer = new WebSocket('ws://127.0.0.1:3001');
-        wsServer.onopen = function (e) {
-            (typeof e == 'string') && wsServer.send(e);//向后台发送数据
-            testEditor.setSelection({line:0, ch:0}, {line:100000, ch:100000});
-            testEditor.replaceSelection(e);
-        };
-        wsServer.onclose = function (e) {//当链接关闭的时候触发
-        
-        };
-        wsServer.onmessage = function (e) {//后台返回消息的时候触发
-                console.log(e);
-        };
-        wsServer.onerror = function (e) {//错误情况触发
-        
-        }
-    </script>
+    <script src="../lib/js/jquery.min.js"></script>
+    <script src="../lib/editmd_lib/editormd.min.js"></script>
+    <script src="../web/index.js"> </script>
     <body>
         <p1>2222</p1>
         <input type="text" onblur="wsServer.onopen(this.value)">
@@ -56,13 +18,8 @@
                 <h1>Simple example</h1>
             </header>
             <div id="test-editormd">
-                <textarea id="md_content" style="display:none;">
-
-                    #### Disabled options
-
-                </textarea>
+                <textarea id="md_content" style="display:none;"></textarea>
             </div>
         </div>
-        
     </body> 
 </html>

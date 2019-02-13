@@ -17,6 +17,7 @@ var module_route = require('./Script/Api/Module');
 var flow = require('./Script/Api/Flow');
 var userInfo = require('./Script/Api/UserInfo');
 var vote = require('./Script/Api/Vote');
+var doc = require('./Script/Api/Doc')
 
 
 
@@ -55,6 +56,7 @@ app.use('/module',module_route);
 app.use('/flow',flow);
 app.use('/userInfo',userInfo);
 app.use('/vote',vote);
+app.use('/doc',doc);
 
 
 

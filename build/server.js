@@ -14,6 +14,7 @@ var module_route = require('./Script/Api/Module');
 var flow = require('./Script/Api/Flow');
 var userInfo = require('./Script/Api/UserInfo');
 var vote = require('./Script/Api/Vote');
+var doc = require('./Script/Api/Doc');
 app.all('*', function (req, res, next) {
     console.log(new Date() + " : " + req.url);
     res.header("Access-Control-Allow-Origin", "*");
@@ -40,6 +41,7 @@ app.use('/module', module_route);
 app.use('/flow', flow);
 app.use('/userInfo', userInfo);
 app.use('/vote', vote);
+app.use('/doc', doc);
 app.get("/", function (request, response) {
     response.send("hello world");
 });
@@ -83,7 +85,7 @@ const wss = new ws_1.default.Server({
 });
 wss.on('connection', function connection(socket, request) {
     console.log(socket + "is connection");
-    console.log(request);
+    console.log(request.headers);
     socket.on('message', function incoming(message) {
         console.log('received: %s', message);
     });
