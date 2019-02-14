@@ -1,3 +1,13 @@
+
+var SocketType = {
+    initSocket : "kInitSocket",
+    initSocketSuccess : "kInitSocketSuccess",
+    initSocketError : "kInitSocketError",
+    updateDoc : "kUpdateDoc", 
+
+}
+
+
 class DocModel {
     constructor() {
         this.guid = "";
@@ -210,20 +220,6 @@ function createContent(begin_line,end_line,content,over_contents) {
             alert(data.msg);
         }
     });
-
-    
-    // $.post("./doc/createContent",para , function(data,status){
-    //     console.log(data);
-    //     console.log(status);
-
-    //     if (data.code != 200) {
-    //         alert(data.msg);
-    //         return;
-    //     } 
-    //     docStrArr = over_contents;
-    //     console.log(over_contents);
-    //     console.log("保存成功");
-    // });
 }
 
 
@@ -239,8 +235,12 @@ function createContent(begin_line,end_line,content,over_contents) {
 
 wsServer.onopen = function (e) {
     if (typeof e == 'string') {
-        wsServer.send(e);//向后台发送数据
-        testEditor.setMarkdown(e);
+        let para = {
+            type:SocketType.initSocket,
+            content:e
+        }
+
+        wsServer.send(JSON.stringify(para));//向后台发送数据
     }
 };
 wsServer.onclose = function (e) {//当链接关闭的时候触发

@@ -62,42 +62,5 @@ let server = app.listen(3000, () => {
     console.log(new Date());
     console.log("Server is begin at port:" + server.address().port);
 });
-const ws_1 = __importDefault(require("ws"));
-console.log("开始建立连接..." + new Date());
-const wss = new ws_1.default.Server({
-    port: 3001,
-    perMessageDeflate: {
-        zlibDeflateOptions: {
-            // See zlib defaults.
-            chunkSize: 1024,
-            memLevel: 7,
-            level: 3
-        },
-        // Other options settable:
-        clientNoContextTakeover: true,
-        serverNoContextTakeover: true,
-        serverMaxWindowBits: 10,
-        // Below options specified as default values.
-        concurrencyLimit: 10,
-        threshold: 1024 // Size (in bytes) below which messages
-        // should not be compressed.
-    }
-});
-wss.on('connection', function connection(socket, request) {
-    console.log(socket + "is connection");
-    console.log(request.headers);
-    socket.on('message', function incoming(message) {
-        console.log('received: %s', message);
-    });
-    socket.on('close', function close(code, reason) {
-        console.log('close: ' + code + " reason: " + reason);
-    });
-    socket.on('open', function open() {
-        console.log('open');
-    });
-    socket.on('error', function error(err) {
-        console.log(err);
-    });
-    socket.send('11111');
-});
-console.log("建立连接完成" + new Date());
+const WebSocketManager_1 = require("./Script/Global/WebSocketManager");
+WebSocketManager_1.wsm;
