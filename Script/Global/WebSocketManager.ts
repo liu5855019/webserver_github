@@ -1,5 +1,6 @@
 
 import ws from 'ws'
+import { WSASERVICE_NOT_FOUND } from 'constants';
 
 
 var SocketType = {
@@ -61,6 +62,9 @@ export class WebSocketManager {
             socket.on('message',function incoming(message){
                 let str = message.toString();
                 let objs = JSON.parse(str);
+                if (objs.type === SocketType.initSocket) {
+                    wsm.actionWithInitSocket(socket,objs);
+                } 
             });
             socket.on('close',function close(code,reason){
                 console.log('close: ' + code + " reason: " + reason);
@@ -85,8 +89,47 @@ export class WebSocketManager {
         console.log("建立连接完成" + new Date())
         
     }
-}
 
+
+    //cookie
+    //doc_guid
+    actionWithInitSocket(socket:ws,objs:any) 
+    {
+        var model : SocketModel|null = null;
+        for (let index = 0; index < wsm.socketArr.length; index++) {
+            const element = wsm.socketArr[index];
+            if (element.socket === socket) {
+                model = element;
+                break;
+            }
+        }
+
+        if (model != null) {
+            model.cookie = objs.cookie;
+            model.doc_guid = objs.doc_guid;
+            socket.send(JSON.stringify({ type:SocketType.initSocketSuccess }));
+        } else {
+            socket.send(JSON.stringify({ type:SocketType.initSocketSuccess }));
+        }
+    }
+
+    actionWithUpdateDoc(cookie:string,doc_guid:string)
+    {
+        let waitForSend : SocketModel[] = [];
+
+        for (let index = 0; index < this.socketArr.length; index++) {
+            const element = this.socketArr[index];
+            if (element.doc_guid === doc_guid && element.cookie != cookie) {
+                waitForSend.push(element);
+            }
+        }
+
+        for (let index = 0; index < waitForSend.length; index++) {
+            const element = waitForSend[index];
+            element.socket.send(JSON.stringify({type:SocketType.updateDoc}));
+        }
+    }
+}
 
 
 export let wsm = new WebSocketManager(); 

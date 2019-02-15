@@ -132,7 +132,7 @@ router.post('/login',function (req,res) {
                     let tmpStr = username + timeInterval;
                     let token = md5(tmpStr);
                     console.log(token);
-                    var date =  new Date(timeInterval + 3 * 3600000);
+                    var date =  new Date(timeInterval + 48 * 3600000);
 
                     login(connection,username,token,date,res,function(result) {
                         res.send({

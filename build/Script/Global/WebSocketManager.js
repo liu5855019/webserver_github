@@ -47,7 +47,9 @@ class WebSocketManager {
             socket.on('message', function incoming(message) {
                 let str = message.toString();
                 let objs = JSON.parse(str);
-                
+                if (objs.type === SocketType.initSocket) {
+                    exports.wsm.actionWithInitSocket(socket, objs);
+                }
             });
             socket.on('close', function close(code, reason) {
                 console.log('close: ' + code + " reason: " + reason);
@@ -68,6 +70,39 @@ class WebSocketManager {
             socket.send('11111');
         });
         console.log("建立连接完成" + new Date());
+    }
+    //cookie
+    //doc_guid
+    actionWithInitSocket(socket, objs) {
+        var model = null;
+        for (let index = 0; index < exports.wsm.socketArr.length; index++) {
+            const element = exports.wsm.socketArr[index];
+            if (element.socket === socket) {
+                model = element;
+                break;
+            }
+        }
+        if (model != null) {
+            model.cookie = objs.cookie;
+            model.doc_guid = objs.doc_guid;
+            socket.send(JSON.stringify({ type: SocketType.initSocketSuccess }));
+        }
+        else {
+            socket.send(JSON.stringify({ type: SocketType.initSocketSuccess }));
+        }
+    }
+    actionWithUpdateDoc(cookie, doc_guid) {
+        let waitForSend = [];
+        for (let index = 0; index < this.socketArr.length; index++) {
+            const element = this.socketArr[index];
+            if (element.doc_guid === doc_guid && element.cookie != cookie) {
+                waitForSend.push(element);
+            }
+        }
+        for (let index = 0; index < waitForSend.length; index++) {
+            const element = waitForSend[index];
+            element.socket.send(JSON.stringify({ type: SocketType.updateDoc }));
+        }
     }
 }
 exports.WebSocketManager = WebSocketManager;

@@ -74,9 +74,16 @@ app.set('views','./public/web');
 app.set('view engine', 'ejs');
 
 app.get("/index",function (req , res) {
-    
     res.render('index');
 });
+
+app.get("/mdList",function (req,res) {
+    res.render('markdown');
+})
+
+app.get("/login",function (req,res) {
+    res.render('login');
+})
 
 app.get("/uploadScore", function (request , response) {
     console.log("访问了/uploadScore");
