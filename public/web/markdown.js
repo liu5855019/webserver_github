@@ -18,9 +18,7 @@ function getMarkdownList() {
                 return;
             } 
             debugger;
-            token = data.obj.token;
-            setCookie("dmtoken",token);
-            checkCookie();
+            
         },
         error:function(data){
             alert(data.msg);
