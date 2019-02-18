@@ -1,4 +1,36 @@
- //展示数据
+
+function getMarkdownList() {
+    
+    para = {
+    }
+
+    $.ajax({
+        async:false,
+        type:"post",
+        url:"./doc/docList",
+        data:JSON.stringify(para),
+        dataType:"json",
+        contentType: "application/json; charset=utf-8",  
+        success:function(data){
+            console.log(data);
+            if (data.code != 200) {
+                alert(data.msg);
+                return;
+            } 
+            debugger;
+            token = data.obj.token;
+            setCookie("dmtoken",token);
+            checkCookie();
+        },
+        error:function(data){
+            alert(data.msg);
+        }
+    });
+}
+
+
+
+//展示数据
 function showData(data) {
     debugger;
     var str = "";//定义用于拼接的字符串
@@ -16,5 +48,5 @@ function clickLookBtn(btn)
     
 }
 
-showData("");
+getMarkdownList();
 

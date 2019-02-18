@@ -11,6 +11,7 @@ const express = __importStar(require("express"));
 let router = express.Router();
 const DBConfig_1 = require("../Global/DBConfig");
 const DMTools_1 = require("../Global/DMTools");
+const Project_1 = require("../Global/Project");
 var md5 = require('../../JSTools/Md5');
 const user_guid = "aef0bc71-bb7f-4631-b077-17b6fc649528";
 class DocModel {
@@ -149,6 +150,26 @@ router.post('/docInfo', function (req, res) {
         });
     });
 });
+router.post('/docList', function (req, res) {
+    let query = req.body;
+    console.log(query);
+    DBConfig_1.pool.getConnection(function (err, connection) {
+        if (err) {
+            res.status(500).send(err);
+            return;
+        }
+        Project_1.Project.getUser(req, connection, res, function (user) {
+            getDocList(user, connection, res, function (result) {
+                res.send({
+                    "code": 200,
+                    "msg": "Success",
+                    "obj": result
+                });
+                connection.release();
+            });
+        });
+    });
+});
 function createDoc(title, createrGuid, connection, res, callback) {
     var sql = "INSERT INTO doc (guid,title,creater,create_time) VALUES(?,?,?,?)";
     var guid = DMTools_1.DMTools.guid();
@@ -230,63 +251,32 @@ function getDocContentList(doc_guid, connection, res, callback) {
         }
     });
 }
-// function createOrUpdateUserInof(userInfo:UserInfoModel , createrGuid:string , connection:PoolConnection ,  res:any ,  callback:(result:any)=>void)
-// {
-//     var sql = "";
-//     var values = null;
-//     if (!userInfo.guid || userInfo.guid.length < 10) {
-//         sql = "INSERT INTO user (guid,account_guid,user_name,department_guid,role_guid,updater,update_time) VALUES(?,?,?,?,?,?,?)";   
-//         values = [DMTools.guid() , userInfo.account_guid , userInfo.user_name , userInfo.department_guid , userInfo.role_guid , createrGuid,new Date()];       
-//     } else {
-//         sql = "UPDATE user SET user_name = ? , department_guid = ? , role_guid = ? , updater = ? , update_time = ? WHERE account_guid = ?";
-//         values = [userInfo.user_name , userInfo.department_guid , userInfo.role_guid , createrGuid , new Date() , userInfo.account_guid];
-//     }
-//     connection.query(sql, values , function (err,result) {
-//         if (err) {
-//             res.send(500,err);
-//             connection.release();
-//         } else {
-//             callback(result);
-//         }
-//     });
-// }
-// function getUserInfo(account_guid : string, connection:PoolConnection ,  res:any ,  callback:(result:UserInfoModel)=>void) 
-// {
-//     let sql = "SELECT * FROM user u \
-//     LEFT JOIN department d on u.department_guid = d.guid \
-//     LEFT JOIN role r ON u.role_guid = r.guid \
-//     where u.account_guid = ?"
-//     connection.query(sql,account_guid,function (err,result) {
-//         if (err) {
-//             res.send(500,err);
-//             connection.release();
-//         } else {
-//             let user = new UserInfoModel();
-//             user.account_guid = account_guid;
-//             if (result.length) {
-//                 let tmpUser = result[0];
-//                 user.guid = tmpUser.guid;
-//                 user.department_guid = tmpUser.department_guid;
-//                 user.department_name = tmpUser.department_name;
-//                 user.role_guid = tmpUser.role_guid;
-//                 user.role_name = tmpUser.role_name;
-//                 user.user_name = tmpUser.user_name;
-//                 callback(user);
-//             } else {
-//                 callback(user);
-//             }
-//         }
-//     });
-// }
-// function getAccountList( connection:PoolConnection ,  res:any ,  callback:(result:UserInfoModel)=>void) 
-// {
-//     connection.query('SELECT * FROM account',function (err,result) {
-//         if (err) {
-//             res.send(500,err);
-//             connection.release();
-//         } else {
-//             callback(result);
-//         }
-//     });
-// }
+function getDocList(user, connection, res, callback) {
+    let sql = "SELECT * FROM doc";
+    connection.query(sql, function (err, result) {
+        if (err) {
+            res.send(500, err);
+            connection.release();
+        }
+        else {
+            var docArr = [];
+            for (let index = 0; index < result.length; index++) {
+                const item = result[index];
+                let model = new DocModel();
+                model.guid = item.guid;
+                model.title = item.title;
+                model.create_time = item.create_time.getTime();
+                model.creater = item.creater;
+                var path = -1;
+                if (item.power) {
+                    path = item.power.indexOf(user.guid);
+                }
+                if (model.creater == user.guid || path != -1) {
+                    docArr.push(model);
+                }
+            }
+            callback(docArr);
+        }
+    });
+}
 module.exports = router;
