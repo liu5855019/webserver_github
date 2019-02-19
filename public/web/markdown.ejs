@@ -3,16 +3,21 @@
     <head>
         <meta charset="UTF-8">
         <title>Document</title>
+        <link rel="stylesheet" href="../lib/editmd_lib/css/style.css" />
+        <link rel="stylesheet" href="../lib/editmd_lib/css/editormd.css" />
         <link rel="shortcut icon" href="https://pandao.github.io/editor.md/favicon.ico" type="image/x-icon" />
-        
     </head>
-    <body>
-        <table id="tab">
-            <tr>
-                <td>Name</td> <td>Create Time</td>
-            </tr>
-        </table>
-    </body> 
     <script src="../lib/js/jquery.min.js"></script>
+    <script src="../lib/editmd_lib/editormd.min.js"></script>
     <script src="../web/markdown.js"> </script>
+    <body>
+        <div id="layout">
+            <header>
+                <h1>Simple example</h1>
+            </header>
+            <div id="test-editormd">
+                <textarea id="md_content" style="display:none;"></textarea>
+            </div>
+        </div>
+    </body> 
 </html>

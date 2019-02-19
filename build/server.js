@@ -54,10 +54,10 @@ app.get("/index", function (req, res) {
     res.render('index');
 });
 app.get("/mdList", function (req, res) {
-    res.render('markdown');
+    res.render('mdList');
 });
-app.get("/login", function (req, res) {
-    res.render('login');
+app.get("/markdown", function (req, res) {
+    res.render('markdown');
 });
 app.get("/uploadScore", function (request, response) {
     console.log("访问了/uploadScore");
