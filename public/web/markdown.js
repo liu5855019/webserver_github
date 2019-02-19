@@ -7,7 +7,6 @@ var SocketType = {
 
 }
 
-
 class DocModel {
     constructor() {
         this.guid = "";
@@ -31,14 +30,15 @@ class DocContentModel {
     }
 }
 
+
 var testEditor;
-var wsServer = new WebSocket('ws://127.0.0.1:3001');
-const k_doc_guid = "b576fd20-9364-48ae-8873-57778cc3293d";
+var wsServer = new WebSocket("ws://" + document.location.hostname + ":3001");
+const k_doc_guid = GetUrlParam("guid");
 
 
 let docInfo = new DocModel(); 
-let docContents = [];  //DocContentModel[]
-let docStrArr = [];
+var docContents = [];  //DocContentModel[]
+var docStrArr = [];
 
 $(function() {
     testEditor = editormd("test-editormd", {
@@ -60,17 +60,6 @@ $(function() {
         } , 
     });
 });
-
-
-function createDoc(title) {
-    var para = {
-        title : title
-    }
-    $.post("./doc/createDoc",para , function(data,status){
-        console.log(data);
-        console.log(status);
-    });
-}
 
 // 获取Doc信息
 function getDocInfo(doc_guid) {
@@ -97,14 +86,7 @@ function getDocInfo(doc_guid) {
         docInfo.power = doc.power;
         docInfo.title = doc.title;
         
-        this.guid = "";
-        this.doc_guid = "";
-        this.begin_line = 0;
-        this.end_line = 0;
-        this.content = "";
-        this.creater = "";
-        this.create_time = 0;
-
+        let tmpContents = [];
         for (let index = 0; index < arr.length; index++) {
             const item = arr[index];
             let docContent = new DocContentModel();
@@ -115,13 +97,15 @@ function getDocInfo(doc_guid) {
             docContent.content = item.content;
             docContent.create_time = item.create_time;
             docContent.creater = item.creater;
-            docContents.push(docContent);
+            tmpContents.push(docContent);
         }
+        docContents = tmpContents;
 
         connectContent();
     });
 }
 
+//将获取到的信息按规则链接成真正的doc
 function connectContent() {
     var strArr = [];
 
@@ -144,6 +128,7 @@ function connectContent() {
     testEditor.setMarkdown(strArr.join("\n"));
 }
 
+//当内容发生改变,比较修改了什么,当达到一定条件后发送给后台
 function compareContent() {
     str = testEditor.getValue();
     strArr = str.split("\n");
@@ -188,6 +173,7 @@ function compareContent() {
     }
 }
 
+// 向后台发送最新修改的内容
 function createContent(begin_line,end_line,content,over_contents) {
     para = {
         doc_guid : k_doc_guid,
@@ -195,10 +181,8 @@ function createContent(begin_line,end_line,content,over_contents) {
         end_line : end_line,
         content : content
     };
-
     console.log(para);
                  
-    
     $.ajax({
         async:false,
         type:"post",
@@ -222,7 +206,15 @@ function createContent(begin_line,end_line,content,over_contents) {
     });
 }
 
-
+function reloadContent() {
+    post("./doc/contentList",{doc_guid:k_doc_guid},function (data){
+        console.log(data);
+        
+    },function (err) {
+        console.log(err);
+        
+    });
+}
 
 
 
@@ -234,21 +226,36 @@ function createContent(begin_line,end_line,content,over_contents) {
 
 
 wsServer.onopen = function (e) {
-    if (typeof e == 'string') {
-        let para = {
-            type:SocketType.initSocket,
-            content:e
-        }
-
-        wsServer.send(JSON.stringify(para));//向后台发送数据
-    }
+    // if (typeof e == 'string') {
+        
+    // }
+    initSocket();
 };
 wsServer.onclose = function (e) {//当链接关闭的时候触发
 
 };
 wsServer.onmessage = function (e) {//后台返回消息的时候触发
-        console.log(e);
+    let obj = JSON.parse(e.data.toString());
+    let type = obj.type;
+    if (type == SocketType.initSocketSuccess) {
+        console.log("socket init success");
+    } else if (type == SocketType.initSocketError) {
+        console.log("socket init failed");
+    } else if (type == SocketType.updateDoc) {
+        reloadContent();
+    }
 };
 wsServer.onerror = function (e) {//错误情况触发
 
 }
+
+function initSocket() {
+    let para = {
+        type:SocketType.initSocket,
+        cookie:getCookie("dmtoken"),
+        doc_guid:k_doc_guid
+    }
+    wsServer.send(JSON.stringify(para));//向后台发送数据
+}
+
+

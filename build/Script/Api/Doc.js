@@ -12,8 +12,8 @@ let router = express.Router();
 const DBConfig_1 = require("../Global/DBConfig");
 const DMTools_1 = require("../Global/DMTools");
 const Project_1 = require("../Global/Project");
+const WebSocketManager_1 = require("../Global/WebSocketManager");
 var md5 = require('../../JSTools/Md5');
-const user_guid = "aef0bc71-bb7f-4631-b077-17b6fc649528";
 class DocModel {
     constructor() {
         this.guid = "";
@@ -38,46 +38,31 @@ router.post('/createDoc', function (req, res) {
     let query = req.body;
     console.log(query);
     var title = query.title;
-    var cookie = req.cookies;
-    if (!title || title.length < 2) {
-        res.send({
-            "code": 201,
-            "msg": "please gave me title",
-            "obj": null
-        });
-        return;
-    }
-    // if (!cookie || cookie.length < 2) {
-    //     res.send({
-    //         "code":202,
-    //         "msg":"please gave me cookie",
-    //         "obj":null
-    //     });
-    //     return;
-    // }
     DBConfig_1.pool.getConnection(function (err, connection) {
         if (err) {
             res.status(500).send(err);
             return;
         }
-        createDoc(title, user_guid, connection, res, function (vote_guid) {
-            res.send({
-                "code": 200,
-                "msg": "Success",
-                "obj": null
+        Project_1.Project.getUser(req, connection, res, function (user) {
+            createDoc(title, user.guid, connection, res, function (vote_guid) {
+                res.send({
+                    "code": 200,
+                    "msg": "Success",
+                    "obj": null
+                });
+                connection.release();
             });
-            connection.release();
         });
     });
 });
 router.post('/createContent', function (req, res) {
     let query = req.body;
     console.log(query);
-    var doc_guid = query.doc_guid;
-    var begin_line = query.begin_line;
-    var end_line = query.end_line;
-    var content = query.content;
-    var cookie = req.cookies;
+    let doc_guid = query.doc_guid;
+    let begin_line = query.begin_line;
+    let end_line = query.end_line;
+    let content = query.content;
+    let cookie = Project_1.Project.getCookie("dmtoken", req.headers.cookie);
     if (!doc_guid || doc_guid.length < 2) {
         res.send({
             "code": 201,
@@ -86,34 +71,45 @@ router.post('/createContent', function (req, res) {
         });
         return;
     }
-    // if (!cookie || cookie.length < 2) {
-    //     res.send({
-    //         "code":202,
-    //         "msg":"please gave me cookie",
-    //         "obj":null
-    //     });
-    //     return;
-    // }
     DBConfig_1.pool.getConnection(function (err, connection) {
         if (err) {
             res.status(500).send(err);
             return;
         }
-        createContent(doc_guid, begin_line, end_line, content, user_guid, connection, res, function (result) {
-            res.send({
-                "code": 200,
-                "msg": "Success",
-                "obj": null
+        Project_1.Project.getUser(req, connection, res, function (user) {
+            getDocInfo(doc_guid, connection, res, function (result) {
+                var path = -1;
+                if (result.power) {
+                    path = result.power.indexOf(user.guid);
+                }
+                if (user.guid == result.creater || path != -1) {
+                    createContent(doc_guid, begin_line, end_line, content, user.guid, connection, res, function (result) {
+                        res.send({
+                            "code": 200,
+                            "msg": "Success",
+                            "obj": null
+                        });
+                        WebSocketManager_1.wsm.actionWithUpdateDoc(cookie, doc_guid);
+                        connection.release();
+                    });
+                }
+                else {
+                    res.send({
+                        "code": 300,
+                        "msg": "You have no power to update this markdown",
+                        "obj": null
+                    });
+                    connection.release();
+                }
             });
-            connection.release();
         });
     });
 });
+//doc_guid
 router.post('/docInfo', function (req, res) {
     let query = req.body;
     console.log(query);
     var doc_guid = query.doc_guid;
-    var cookie = req.cookies;
     if (!doc_guid || doc_guid.length < 2) {
         res.send({
             "code": 201,
@@ -122,14 +118,6 @@ router.post('/docInfo', function (req, res) {
         });
         return;
     }
-    // if (!cookie || cookie.length < 2) {
-    //     res.send({
-    //         "code":202,
-    //         "msg":"please gave me cookie",
-    //         "obj":null
-    //     });
-    //     return;
-    // }
     DBConfig_1.pool.getConnection(function (err, connection) {
         if (err) {
             res.status(500).send(err);
@@ -167,6 +155,34 @@ router.post('/docList', function (req, res) {
                 });
                 connection.release();
             });
+        });
+    });
+});
+//doc_guid
+router.post('/contentList', function (req, res) {
+    let query = req.body;
+    console.log(query);
+    var doc_guid = query.doc_guid;
+    if (!doc_guid || doc_guid.length < 2) {
+        res.send({
+            "code": 201,
+            "msg": "please gave me doc_guid",
+            "obj": null
+        });
+        return;
+    }
+    DBConfig_1.pool.getConnection(function (err, connection) {
+        if (err) {
+            res.status(500).send(err);
+            return;
+        }
+        getDocContentList(doc_guid, connection, res, function (contents) {
+            res.send({
+                "code": 200,
+                "msg": "Success",
+                "obj": contents
+            });
+            connection.release();
         });
     });
 });
@@ -213,6 +229,7 @@ function getDocInfo(guid, connection, res, callback) {
                 doc.title = tmpDoc.title;
                 doc.creater = tmpDoc.creater;
                 doc.create_time = tmpDoc.create_time.getTime();
+                doc.power = tmpDoc.power;
                 callback(doc);
             }
             else {

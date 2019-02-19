@@ -81,9 +81,7 @@ export class WebSocketManager {
             });
             socket.on('error', function error(err){
                 console.log(err);
-            });
-    
-            socket.send('11111');     
+            });   
         });
     
         console.log("建立连接完成" + new Date())

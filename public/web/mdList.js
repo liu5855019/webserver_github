@@ -47,5 +47,17 @@ function clickLookBtn(btn)
     }
 }
 
+
+function createDoc(title) {
+    var para = {
+        title : title
+    }
+    $.post("./doc/createDoc",para , function(data,status){
+        console.log(data);
+        console.log(status);
+    });
+}
+
+
 getMarkdownList();
 
