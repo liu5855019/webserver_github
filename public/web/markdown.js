@@ -151,22 +151,27 @@ function compareContent() {
         return;
     }
 
-    strArr = str.split("\n");
-    over_contents = str.split("\n");
+    strArr = str.split("\n");   //用来比较的str数组,比较过程中会修改数组
+    over_contents = str.split("\n");    //用来保存最新的完整的数组
 
-    oldArr = docStrArr;
-    begin_line = 0;
-    end_line = 0;
-
+    oldArr = copyArray(docStrArr); 
+    
     if (strArr.length != docStrArr.length) {
-        //debugger;
+        debugger;
+        begin_line = 0;
+        end_line = 0;
+        isReadOldOver = true;
         for (let index = 0; index < docStrArr.length; index++) {
             const oldStr = docStrArr[index];
             const newStr = strArr[index];
             if (oldStr != newStr) {
                 begin_line = index;
+                isReadOldOver = false;
                 break;
             }
+        }
+        if (isReadOldOver) {
+            begin_line = docStrArr.length;
         }
 
         strArr.splice(0,begin_line);

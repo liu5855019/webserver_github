@@ -80,3 +80,16 @@ function dateFmt(date,fmt)
   return fmt;   
 } 
 
+function copyArray(oldArr)
+{
+    if (!oldArr) {
+        return oldArr;
+    }
+    newArr = [];
+    for (let index = 0; index < oldArr.length; index++) {
+        const element = oldArr[index];
+        newArr.push(element);
+    }
+    return newArr;
+}
+
