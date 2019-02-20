@@ -60,8 +60,9 @@ function showData(data) {
     for (var i = 0; i < data.length ;i++) {
         let item = data[i];
         dateStr = dateFmt(new Date(item.create_time),"yyyy-MM-dd hh:mm");
+        meStr = item.creater.length > 0 ? "我创建" : "其他人"
         //拼接表格的行和列
-        str = "<tr><td> " + item.title + " </td><td> " + dateStr + " </td><td><button name=\"" +item.guid+  "\"type=\"button\" onclick=\"clickLookBtn(this)\">Look</button></td></tr>";
+        str = "<tr><td> " + item.title + " </td><td> " + dateStr + " </td><td> " + meStr + " </td><td><button name=\"" +item.guid+  "\"type=\"button\" onclick=\"clickLookBtn(this)\">Look</button></td></tr>";
         //追加到table中
         $("#tab").append(str);         
     }

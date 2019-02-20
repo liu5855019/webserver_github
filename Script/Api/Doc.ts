@@ -19,7 +19,6 @@ class DocModel {
     power = "";
     creater = "";
     create_time = 0;
-
     constructor() {
     }
 }
@@ -188,7 +187,7 @@ router.post('/docList', function (req , res)
             getDocList(user,connection,res,function (result) {
                 res.send({
                     "code":200,
-                    "msg":"Success",
+                    "msg":user.guid,
                     "obj":result
                 });
                 connection.release();
@@ -347,6 +346,9 @@ function getDocList(user : any, connection:PoolConnection ,  res:any ,  callback
                     path = item.power.indexOf(user.guid);
                 }
                 if (model.creater == user.guid || path != -1) {
+                    if (model.creater != user.guid) {
+                        model.creater = "";
+                    }
                     docArr.push(model);
                 }
             }
