@@ -111,20 +111,20 @@ export class WebSocketManager {
         }
     }
 
-    actionWithUpdateDoc(cookie:string,doc_guid:string)
+    actionWithUpdateDoc(doc_guid:string,count:number)
     {
         let waitForSend : SocketModel[] = [];
 
         for (let index = 0; index < this.socketArr.length; index++) {
             const element = this.socketArr[index];
-            if (element.doc_guid === doc_guid && element.cookie != cookie) {
+            if (element.doc_guid === doc_guid) {
                 waitForSend.push(element);
             }
         }
 
         for (let index = 0; index < waitForSend.length; index++) {
             const element = waitForSend[index];
-            element.socket.send(JSON.stringify({type:SocketType.updateDoc}));
+            element.socket.send(JSON.stringify({type:SocketType.updateDoc,count:count}));
         }
     }
 }

@@ -86,6 +86,8 @@ function getDocInfo(doc_guid) {
         docInfo.power = doc.power;
         docInfo.title = doc.title;
         
+        document.getElementById("title").innerHTML = doc.title;
+
         let tmpContents = [];
         for (let index = 0; index < arr.length; index++) {
             const item = arr[index];
@@ -170,6 +172,8 @@ function compareContent() {
         }
 
         createContent(begin_line,end_line,content,over_contents);
+    } else {
+        document.getElementById("state").innerHTML = "未保存";
     }
 }
 
@@ -179,7 +183,8 @@ function createContent(begin_line,end_line,content,over_contents) {
         doc_guid : k_doc_guid,
         begin_line : begin_line,
         end_line : end_line,
-        content : content
+        content : content,
+        count:docContents.length
     };
     console.log(para);
                  
@@ -194,11 +199,21 @@ function createContent(begin_line,end_line,content,over_contents) {
             console.log(data);
             if (data.code != 200) {
                 alert(data.msg);
+                if (data.code == 202) {
+                    reloadContent();
+                }
                 return;
             } 
             docStrArr = over_contents;
+            let docContent = new DocContentModel();
+            docContent.doc_guid = k_doc_guid;
+            docContent.begin_line = begin_line;
+            docContent.end_line = end_line;
+            docContent.content = content;
+            docContents.push(docContent);
             console.log(over_contents);
             console.log("保存成功");
+            document.getElementById("state").innerHTML = "已保存";
         },
         error:function(data){
             alert(data.msg);
@@ -209,10 +224,24 @@ function createContent(begin_line,end_line,content,over_contents) {
 function reloadContent() {
     post("./doc/contentList",{doc_guid:k_doc_guid},function (data){
         console.log(data);
-        
+        arr = data.obj;
+        let tmpContents = [];
+        for (let index = 0; index < arr.length; index++) {
+            const item = arr[index];
+            let docContent = new DocContentModel();
+            docContent.guid = item.guid;
+            docContent.doc_guid = item.doc_guid;
+            docContent.begin_line = item.begin_line;
+            docContent.end_line = item.end_line;
+            docContent.content = item.content;
+            docContent.create_time = item.create_time;
+            docContent.creater = item.creater;
+            tmpContents.push(docContent);
+        }
+        docContents = tmpContents;
+        connectContent();
     },function (err) {
         console.log(err);
-        
     });
 }
 
@@ -226,9 +255,6 @@ function reloadContent() {
 
 
 wsServer.onopen = function (e) {
-    // if (typeof e == 'string') {
-        
-    // }
     initSocket();
 };
 wsServer.onclose = function (e) {//当链接关闭的时候触发
@@ -242,7 +268,9 @@ wsServer.onmessage = function (e) {//后台返回消息的时候触发
     } else if (type == SocketType.initSocketError) {
         console.log("socket init failed");
     } else if (type == SocketType.updateDoc) {
-        reloadContent();
+        if (docContents.length != obj.count) {
+            reloadContent();
+        }
     }
 };
 wsServer.onerror = function (e) {//错误情况触发
@@ -257,5 +285,9 @@ function initSocket() {
     }
     wsServer.send(JSON.stringify(para));//向后台发送数据
 }
+
+
+
+
 
 

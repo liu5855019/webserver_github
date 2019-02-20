@@ -90,17 +90,17 @@ class WebSocketManager {
             socket.send(JSON.stringify({ type: SocketType.initSocketSuccess }));
         }
     }
-    actionWithUpdateDoc(cookie, doc_guid) {
+    actionWithUpdateDoc(doc_guid, count) {
         let waitForSend = [];
         for (let index = 0; index < this.socketArr.length; index++) {
             const element = this.socketArr[index];
-            if (element.doc_guid === doc_guid && element.cookie != cookie) {
+            if (element.doc_guid === doc_guid) {
                 waitForSend.push(element);
             }
         }
         for (let index = 0; index < waitForSend.length; index++) {
             const element = waitForSend[index];
-            element.socket.send(JSON.stringify({ type: SocketType.updateDoc }));
+            element.socket.send(JSON.stringify({ type: SocketType.updateDoc, count: count }));
         }
     }
 }

@@ -73,8 +73,8 @@ app.get("/",function (request , response) {
 app.set('views','./public/web');
 app.set('view engine', 'ejs');
 
-app.get("/index",function (req , res) {
-    res.render('index');
+app.get("/login",function (req , res) {
+    res.render('login');
 });
 
 app.get("/mdList",function (req,res) {

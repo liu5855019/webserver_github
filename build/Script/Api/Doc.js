@@ -62,7 +62,7 @@ router.post('/createContent', function (req, res) {
     let begin_line = query.begin_line;
     let end_line = query.end_line;
     let content = query.content;
-    let cookie = Project_1.Project.getCookie("dmtoken", req.headers.cookie);
+    let count = query.count;
     if (!doc_guid || doc_guid.length < 2) {
         res.send({
             "code": 201,
@@ -83,14 +83,26 @@ router.post('/createContent', function (req, res) {
                     path = result.power.indexOf(user.guid);
                 }
                 if (user.guid == result.creater || path != -1) {
-                    createContent(doc_guid, begin_line, end_line, content, user.guid, connection, res, function (result) {
-                        res.send({
-                            "code": 200,
-                            "msg": "Success",
-                            "obj": null
-                        });
-                        WebSocketManager_1.wsm.actionWithUpdateDoc(cookie, doc_guid);
-                        connection.release();
+                    getDocContentList(doc_guid, connection, res, function (contentList) {
+                        if (contentList.length == count) {
+                            createContent(doc_guid, begin_line, end_line, content, user.guid, connection, res, function (result) {
+                                res.send({
+                                    "code": 200,
+                                    "msg": "Success",
+                                    "obj": null
+                                });
+                                WebSocketManager_1.wsm.actionWithUpdateDoc(doc_guid, count + 1);
+                                connection.release();
+                            });
+                        }
+                        else {
+                            res.send({
+                                "code": 202,
+                                "msg": "Your doc list need update",
+                                "obj": null
+                            });
+                            connection.release();
+                        }
                     });
                 }
                 else {
