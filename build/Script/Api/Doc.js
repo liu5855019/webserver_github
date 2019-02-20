@@ -135,17 +135,20 @@ router.post('/docInfo', function (req, res) {
             res.status(500).send(err);
             return;
         }
-        getDocInfo(doc_guid, connection, res, function (docModel) {
-            getDocContentList(doc_guid, connection, res, function (contents) {
-                res.send({
-                    "code": 200,
-                    "msg": "Success",
-                    "obj": {
-                        doc: docModel,
-                        contents: contents
-                    }
+        getUser(req, connection, function (userGuid) {
+            getDocInfo(doc_guid, connection, res, function (docModel) {
+                getDocContentList(doc_guid, connection, res, function (contents) {
+                    res.send({
+                        "code": 200,
+                        "msg": "Success",
+                        "obj": {
+                            doc: docModel,
+                            contents: contents,
+                            user: userGuid
+                        }
+                    });
+                    connection.release();
                 });
-                connection.release();
             });
         });
     });
@@ -305,6 +308,33 @@ function getDocList(user, connection, res, callback) {
                 }
             }
             callback(docArr);
+        }
+    });
+}
+function getUser(req, connection, callback) {
+    var token = Project_1.Project.getCookie("dmtoken", req.headers.cookie);
+    if (!token || token.length < 10) {
+        callback(null);
+        return;
+    }
+    connection.query('SELECT * FROM account WHERE token = ?', token, function (err, result) {
+        if (err) {
+            callback(null);
+            return;
+        }
+        if (result.length) {
+            let user = result[0];
+            let date = user.token_time;
+            let now = new Date();
+            if (date.getTime() > now.getTime()) {
+                callback(user.guid);
+            }
+            else {
+                callback(null);
+            }
+        }
+        else {
+            callback(null);
         }
     });
 }

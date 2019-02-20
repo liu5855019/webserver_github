@@ -14,6 +14,9 @@ function getMarkdownList() {
         success:function(data){
             console.log(data);
             if (data.code != 200) {
+                if (data.code == 401) {
+                    logout();
+                }
                 alert(data.msg);
                 return;
             } 
@@ -25,15 +28,40 @@ function getMarkdownList() {
     });
 }
 
+function logout() 
+{
+    setCookie("dmtoken","");
+    window.location.href="./login";
+}
 
+function clickLogoutBtn() 
+{
+    if (confirm("确定要退出吗?")) {
+       logout();
+    } else {
+        
+    }
+}
+
+function clickCreateBtn()
+{
+    var name = prompt("请输入文章标题","");
+
+    if (name.length > 2) {
+        createDoc(name);
+    } else {
+        alert("标题最少 3 个字");
+    }
+}
 
 //展示数据
 function showData(data) {
     var str = "";//定义用于拼接的字符串
     for (var i = 0; i < data.length ;i++) {
         let item = data[i];
+        dateStr = dateFmt(new Date(item.create_time),"yyyy-MM-dd hh:mm");
         //拼接表格的行和列
-        str = "<tr><td>" + item.title + "</td><td>" + new Date(item.create_time) + "</td><td><button name=\"" +item.guid+  "\"type=\"button\" onclick=\"clickLookBtn(this)\">Look</button></td></tr>";
+        str = "<tr><td> " + item.title + " </td><td> " + dateStr + " </td><td><button name=\"" +item.guid+  "\"type=\"button\" onclick=\"clickLookBtn(this)\">Look</button></td></tr>";
         //追加到table中
         $("#tab").append(str);         
     }
@@ -52,9 +80,15 @@ function createDoc(title) {
     var para = {
         title : title
     }
-    $.post("./doc/createDoc",para , function(data,status){
-        console.log(data);
-        console.log(status);
+
+    post("./doc/createDoc",para,function(data){
+        if (data.code == 200) {
+            history.go(0);
+        } else {
+            alert(data.msg);
+        }
+    },function(err){
+        alert(err.msg);
     });
 }
 

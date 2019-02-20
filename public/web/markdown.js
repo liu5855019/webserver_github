@@ -39,6 +39,7 @@ const k_doc_guid = GetUrlParam("guid");
 let docInfo = new DocModel(); 
 var docContents = [];  //DocContentModel[]
 var docStrArr = [];
+var lastResetStr = "";
 
 $(function() {
     testEditor = editormd("test-editormd", {
@@ -67,10 +68,7 @@ function getDocInfo(doc_guid) {
         doc_guid : doc_guid
     }
 
-    $.post("./doc/docInfo",para , function(data,status){
-        console.log(data);
-        console.log(status);
-
+    post("./doc/docInfo",para,function(data){
         if (data.code != 200) {
             alert(data.msg);
             return;
@@ -79,6 +77,18 @@ function getDocInfo(doc_guid) {
         obj = data.obj;
         doc = obj.doc;
         arr = obj.contents;
+        
+        //判断是否有权限修改
+        userGuid = obj.user;
+        var path = -1;
+        if (doc.power && userGuid) {
+            path = doc.power.indexOf(userGuid);
+        }
+        if (userGuid == doc.creater || path != -1) {
+
+        } else {
+            document.getElementById("state").innerHTML = "您不可以编辑此文件";
+        }
 
         docInfo.create_time = doc.create_time;
         docInfo.creater = doc.creater;
@@ -104,7 +114,10 @@ function getDocInfo(doc_guid) {
         docContents = tmpContents;
 
         connectContent();
+    },function(err){
+
     });
+
 }
 
 //将获取到的信息按规则链接成真正的doc
@@ -127,12 +140,17 @@ function connectContent() {
     console.log(strArr);
 
     docStrArr = strArr;
-    testEditor.setMarkdown(strArr.join("\n"));
+    lastResetStr = strArr.join("\n");
+    testEditor.setMarkdown(lastResetStr);
 }
 
 //当内容发生改变,比较修改了什么,当达到一定条件后发送给后台
 function compareContent() {
     str = testEditor.getValue();
+    if (lastResetStr == str) {
+        return;
+    }
+
     strArr = str.split("\n");
     over_contents = str.split("\n");
 
