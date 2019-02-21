@@ -60,9 +60,14 @@ function showData(data) {
     for (var i = 0; i < data.length ;i++) {
         let item = data[i];
         dateStr = dateFmt(new Date(item.create_time),"yyyy-MM-dd hh:mm");
-        meStr = item.creater.length > 0 ? "我创建" : "其他人"
+        meStr = item.creater.length > 0 ? "我创建" : "其他人";
+        editBtnStr = item.creater.length > 0 ? "<td><button name=\"" +item.guid+  "\"type=\"button\" onclick=\"clickEditBtn(this)\">Edit Power</button></td></tr>" : "</tr>";
         //拼接表格的行和列
-        str = "<tr><td> " + item.title + " </td><td> " + dateStr + " </td><td> " + meStr + " </td><td><button name=\"" +item.guid+  "\"type=\"button\" onclick=\"clickLookBtn(this)\">Look</button></td></tr>";
+        str = "<tr><td>" + item.title + "</td>" +
+              "<td>" + dateStr + "</td>" + 
+              "<td>" + meStr + "</td>" +
+              "<td><button name=\"" +item.guid+  "\"type=\"button\" onclick=\"clickLookBtn(this)\">Look</button></td>" +
+              editBtnStr;
         //追加到table中
         $("#tab").append(str);         
     }
@@ -76,6 +81,44 @@ function clickLookBtn(btn)
     }
 }
 
+function clickEditBtn(btn)
+{
+    //<label><input name="apple" type="checkbox" value="aa" checked=true  />苹果</label>
+    if (btn.name) {
+        jQuery('.box').show();
+     
+
+        post("./doc/getPower",{doc_guid:btn.name},function (data) {
+            if (data.code != 200) {
+                if (data.code == 401) {
+                    logout();
+                }
+                alert(data.msg);
+                return;
+            } 
+            accountList = data.obj.accountList;
+            docModel = data.obj.docModel;
+
+            //未完待续
+
+        },function (err) {
+
+        });
+    }
+    
+
+}
+
+function checkForm(form)
+{
+    debugger;
+    console.log(form);
+    
+}
+
+function getPower(guid) {
+    
+}
 
 function createDoc(title) {
     var para = {

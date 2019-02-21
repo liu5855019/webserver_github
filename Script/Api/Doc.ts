@@ -225,7 +225,51 @@ router.post('/contentList', function (req , res) {
             connection.release();
         });
     });
-})
+});
+
+//doc_guid
+router.post('/getPower',function (req , res) {
+    let query = req.body;
+    console.log(query);
+    
+    var doc_guid = query.doc_guid;
+
+    if (!doc_guid || doc_guid.length < 2) {
+        res.send({
+            "code":201,
+            "msg":"please gave me doc_guid",
+            "obj":null
+        });
+        return;
+    }
+
+    pool.getConnection(function (err,connection) {  // 链接数据库
+        if (err) {
+            res.status(500).send(err);
+            return;
+        }
+
+        getAccountList(connection,res,function(accountList){
+            getDocInfo(doc_guid,connection,res,function (docModel) {
+                res.send({
+                    "code":200,
+                    "msg":"Success",
+                    "obj":{
+                        accountList:accountList,
+                        docModel:docModel,
+                    }
+                });
+                connection.release();
+            });
+        });
+    });
+});
+
+router.post('/setPower',function (req , res) {
+
+});
+
+
 
 
 function createDoc(title:string , createrGuid:string , connection:PoolConnection , res:any , callback:(vote_guid:string)=>void) 
@@ -385,6 +429,18 @@ function getUser(req:any , connection:PoolConnection , callback:(userGuid:any)=>
             callback(null);
         }
     })
+}
+
+function getAccountList( connection:PoolConnection ,  res:any ,  callback:(result:any)=>void) 
+{
+    connection.query('SELECT * FROM account',function (err,result) {
+        if (err) {
+            res.send(500,err);
+            connection.release();
+        } else {
+            callback(result);
+        }
+    });
 }
 
 

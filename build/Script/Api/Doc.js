@@ -201,6 +201,41 @@ router.post('/contentList', function (req, res) {
         });
     });
 });
+//doc_guid
+router.post('/getPower', function (req, res) {
+    let query = req.body;
+    console.log(query);
+    var doc_guid = query.doc_guid;
+    if (!doc_guid || doc_guid.length < 2) {
+        res.send({
+            "code": 201,
+            "msg": "please gave me doc_guid",
+            "obj": null
+        });
+        return;
+    }
+    DBConfig_1.pool.getConnection(function (err, connection) {
+        if (err) {
+            res.status(500).send(err);
+            return;
+        }
+        getAccountList(connection, res, function (accountList) {
+            getDocInfo(doc_guid, connection, res, function (docModel) {
+                res.send({
+                    "code": 200,
+                    "msg": "Success",
+                    "obj": {
+                        accountList: accountList,
+                        docModel: docModel,
+                    }
+                });
+                connection.release();
+            });
+        });
+    });
+});
+router.post('/setPower', function (req, res) {
+});
 function createDoc(title, createrGuid, connection, res, callback) {
     var sql = "INSERT INTO doc (guid,title,creater,create_time) VALUES(?,?,?,?)";
     var guid = DMTools_1.DMTools.guid();
@@ -338,6 +373,17 @@ function getUser(req, connection, callback) {
         }
         else {
             callback(null);
+        }
+    });
+}
+function getAccountList(connection, res, callback) {
+    connection.query('SELECT * FROM account', function (err, result) {
+        if (err) {
+            res.send(500, err);
+            connection.release();
+        }
+        else {
+            callback(result);
         }
     });
 }
